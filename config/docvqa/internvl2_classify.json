@@ -1,0 +1,18 @@
+{
+    "dataset_config": {
+        "type": "internvl2",
+        "dataset_path": "data/mpdocvqa_classify/internvl2_for_classify",
+        "preprocessor_config": {
+            "type": "internvl2"
+        }
+    },
+    "val_dataset_config": {
+
+    },
+    "test_dataset_config": {
+
+    },
+    "model_config": {
+        "type": "internvl2"
+    }
+}
