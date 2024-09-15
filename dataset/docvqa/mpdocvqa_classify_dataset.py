@@ -12,12 +12,12 @@ def open_data(json_path):
 
 @prepare_data_and_preprocessor
 class MPDocVQAClassifyDataset(BaseDataset):
-    def __init__(self, dataset_path: str, preprocess_config) -> None:
+    def __init__(self, preprocess_config, dataset_path: str, split:str="train" ) -> None:
         super().__init__(preprocess_config)
 
-        self.dataset_path = os.path.join(dataset_path, "train.json")
+        self.dataset_path = os.path.join(dataset_path, f"{split}.json")
         self.ocr_dir = os.path.join(dataset_path, "ocr")
-        self.image_dir = os.path.join(dataset_path, "image")
+        self.image_dir = os.path.join(dataset_path, "images")
 
     def prepare_data(self):
         data = open_data(self.dataset_path)
@@ -43,12 +43,11 @@ class MPDocVQAClassifyDataset(BaseDataset):
         return ret_data
 
 
-
 if __name__ == "__main__":
     dataset = MPDocVQAClassifyDataset(
         dataset_path="/home/klwang/data/MPDocVQA",
         preprocess_config={
-            "type": ".InternVL2Preprocessor",
+            "type": "dataset.docvqa.internvl2_preprocessor.InternVL2Preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
         },
     )

@@ -26,5 +26,5 @@ if not has_init_logger:
     init_logger()
     has_init_logger = True
 
-# logger = logging.getLogger("elaina")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("elaina")
+# logger = logging.getLogger(__name__)

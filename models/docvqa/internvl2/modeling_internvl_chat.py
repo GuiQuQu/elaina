@@ -99,7 +99,6 @@ class InternVLChatModel(PreTrainedModel):
             return_dict: Optional[bool] = None,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
-
         image_flags = image_flags.squeeze(-1)
         input_embeds = self.language_model.get_input_embeddings()(input_ids)
 
@@ -112,11 +111,11 @@ class InternVLChatModel(PreTrainedModel):
 
         if torch.distributed.get_rank() == 0:
             print(f'dynamic ViT batch size: {vit_batch_size}, images per sample: {vit_batch_size / B}, dynamic token length: {N}')
-
         input_ids = input_ids.reshape(B * N)
         selected = (input_ids == self.img_context_token_id)
         try:
-            input_embeds[selected] = input_embeds[selected] * 0.0 + vit_embeds.reshape(-1, C)
+            
+            input_embeds[selected] = input_embeds[selected] * 0.0  + vit_embeds.reshape(-1, C)
         except Exception as e:
             vit_embeds = vit_embeds.reshape(-1, C)
             print(f'warning: {e}, input_embeds[selected].shape={input_embeds[selected].shape}, '

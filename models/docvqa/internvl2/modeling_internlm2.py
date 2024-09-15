@@ -942,13 +942,22 @@ class InternLM2Model(InternLM2PreTrainedModel):
 
                     return custom_forward
 
-                layer_outputs = torch.utils.checkpoint.checkpoint(
-                    create_custom_forward(decoder_layer),
-                    hidden_states,
-                    attention_mask,
-                    position_ids,
-                    None,
-                )
+                if hasattr(self, '_gradient_checkpointing_func'):
+                    layer_outputs = self._gradient_checkpointing_func(
+                        create_custom_forward(decoder_layer),
+                        hidden_states,
+                        attention_mask,
+                        position_ids,
+                        None,
+                    )
+                else:
+                    layer_outputs = torch.utils.checkpoint.checkpoint(
+                        create_custom_forward(decoder_layer),
+                        hidden_states,
+                        attention_mask,
+                        position_ids,
+                        None,
+                    )
             else:
                 layer_outputs = decoder_layer(
                     hidden_states,
