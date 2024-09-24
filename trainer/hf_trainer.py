@@ -3,6 +3,7 @@ import os
 import transformers
 from transformers import Trainer,HfArgumentParser,TrainingArguments,set_seed
 
+from trainer.base_trainer import BaseTrainer
 from utils.utils import get_cls_or_func
 from trainer.trainer_utils import load_dataset,load_model
 from logger import logger
@@ -26,6 +27,10 @@ def hf_get_last_checkpoint(training_args):
 def build_hf_trainer(config):
     hfparser = HfArgumentParser(TrainingArguments)
     training_args = hfparser.parse_dict(config['training_args'],allow_extra_keys=True)[0]
+    # rewrite output_dir if provided in config
+    output_dir = config.get('output_dir', None)
+    if output_dir is not None:
+        training_args.output_dir = output_dir
     # Log on each process the small summary:
     logger.warning(
         f'Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}'
@@ -60,7 +65,7 @@ def build_hf_trainer(config):
     )
 
 
-class HFTrainer:
+class HFTrainer(BaseTrainer):
     def __init__(
         self,
         model,

@@ -66,7 +66,6 @@ class InternVL2ClassifyModel(nn.Module):
         freeze_llm_model=False,
         frzzze_mlp=True,
         model_dtype="bf16",
-        load_from_ckpt=None,
     ) -> None:
         super().__init__()
         # load into cpu, in train will be transfer to gpu
@@ -89,10 +88,6 @@ class InternVL2ClassifyModel(nn.Module):
             act_fn="relu",
             add_bias=False,
         )
-
-        if load_from_ckpt is not None:
-            # load ckpt from local
-            pass
 
         if freeze_vision_model:
             self.model.vision_model = self.model.vision_model.eval()

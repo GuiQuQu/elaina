@@ -15,7 +15,7 @@ class _DistVarible:
     @property
     def is_main_process(self):
         return self.rank == 0
-    
+
     @property
     def is_local_main_process(self):
         return self.local_rank == 0

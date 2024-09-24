@@ -37,17 +37,15 @@
         "freeze_vision_model": true,
         "freeze_llm_model":false,
         "frzzze_mlp":true,
-        "model_dtype": "bf16",
-        "load_from_ckpt": null
+        "model_dtype": "bf16"
     },
+    "output_dir": "./outputs/MPDocVQA/trainer_test_output",
     "data_collator": "dataset.docvqa.internvl2_preprocessor.internvl2_concat_collator",
     "trainer": "trainer.hf_trainer.HFTrainer",
     "training_args": {
         "do_train": true,
         "do_eval": false,
-        "do_predict": false,
         "run_name": "test_run_v1",
-        "output_dir": "./outputs/MPDocVQA/trainer_test_output",
         "overwrite_output_dir": true,
         "bf16": true,
         "gradient_checkpointing": true,
@@ -74,5 +72,14 @@
         "logging_steps": 10,
         "report_to": "tensorboard",
         "seed": 42
+    },
+    "tester": {
+        "type": "tester.hf_tester.HFTester",
+        "hf_checkpoint_dir": "./outputs/MPDocVQA/classify_output",
+        "dataloader_config": {
+            "batch_size" : 2,
+            "num_workers": 0,
+            "shuffle": false
+        }
     }
 }
