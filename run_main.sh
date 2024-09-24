@@ -14,11 +14,11 @@ echo "NUM_TRAINERS: $NUM_TRAINERS"
 
 # export MASTER_ADDR=localhost
 # export MASTER_PORT=29500
-
 torchrun  \
     --rdzv-backend=c10d \
     --rdzv-endpoint=localhost:0 \
     --nnodes=$NUM_NODES \
     --nproc-per-node=$NUM_TRAINERS \
-    docvqa_train.py \
-    --config_file config/docvqa/internvl2_classify.json
+    main.py \
+    $@
+    

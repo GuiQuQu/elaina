@@ -1,3 +1,7 @@
+"""
+    旧的训练脚本, 在训练docvqa分类模型时有使用，现在已经整合
+    trainer.hf_trainer.py 文件中，可以通过build_hf_trainer来使用
+"""
 import os
 import sys
 import json
@@ -12,8 +16,7 @@ from transformers import HfArgumentParser
 from transformers import set_seed
 
 from utils.utils import get_cls_or_func, load_config
-from utils.dist_variable import DistVarible
-# from docvqa_arguments import TotalArguments
+
 from logger import logger
 
 def get_args():
@@ -22,8 +25,7 @@ def get_args():
     args = parser.parse_args()
     return args
 
-def get_config_from_args():
-    args = get_args()
+def get_config_from_args(args):
     config_path = args.config_file
     return load_config(config_path)
 
@@ -75,7 +77,8 @@ def load_model(model_config):
     return get_cls_or_func(_type)(**model_config)
 
 def main():
-    config = get_config_from_args()
+    args = get_args()
+    config = get_config_from_args(args)
     hfparser = HfArgumentParser(TrainingArguments)
     training_args = hfparser.parse_dict(config['training_args'],allow_extra_keys=True)[0]
     # Log on each process the small summary:
@@ -138,6 +141,7 @@ def main():
         trainer.log_metrics('train', metrics)
         trainer.save_metrics('train', metrics)
         trainer.save_state()
+        trainer._save(output_dir=os.path.join(training_args.output_dir, 'checkpoint-final'))
 
 if __name__ == "__main__":
     main()

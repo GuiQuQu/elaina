@@ -932,7 +932,7 @@ class InternLM2Model(InternLM2PreTrainedModel):
                 all_hidden_states += (hidden_states,)
 
             past_key_value = past_key_values[idx] if past_key_values is not None else None
-
+    
             if self.gradient_checkpointing and self.training:
 
                 def create_custom_forward(module):
