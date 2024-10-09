@@ -22,7 +22,7 @@
     "test_dataset": {
         "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
         "dataset_path": "/home/klwang/data/MPDocVQA",
-        "split": "test",
+        "split": "val",
         "preprocess_config": {
             "type": "dataset.docvqa.internvl2_preprocessor.InternVL2Preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
@@ -41,6 +41,17 @@
     },
     "output_dir": "./outputs/MPDocVQA/trainer_test_output",
     "data_collator": "dataset.docvqa.internvl2_preprocessor.internvl2_concat_collator",
+    "seed": 42,
+    "tester": {
+        "type": "tester.hf_tester.HFTester",
+        "hf_checkpoint_dir": "./outputs/MPDocVQA/classify_output",
+        "dataloader_config": {
+            "max_steps": 5,
+            "batch_size" : 2,
+            "num_workers": 0,
+            "shuffle": false
+        }
+    },
     "trainer": "trainer.hf_trainer.HFTrainer",
     "training_args": {
         "do_train": true,
@@ -51,7 +62,7 @@
         "gradient_checkpointing": true,
         "gradient_checkpointing_kwargs":{"use_reentrant": false},
         "remove_unused_columns": true,
-        "max_steps": 20,
+        "max_steps": 5,
         "per_device_train_batch_size": 2,
         "dataloader_pin_memory": true,
         "dataloader_prefetch_factor ": 2,
@@ -65,21 +76,11 @@
         "warmup_ratio": 0.1,
         "evaluation_strategy": "no",
         "save_strategy": "steps",
-        "save_steps": 5000,
+        "save_steps": 10,
         "save_safetensors": true,
         "save_total_limit": 5,
         "logging_strategy": "steps",
         "logging_steps": 10,
-        "report_to": "tensorboard",
-        "seed": 42
-    },
-    "tester": {
-        "type": "tester.hf_tester.HFTester",
-        "hf_checkpoint_dir": "./outputs/MPDocVQA/classify_output",
-        "dataloader_config": {
-            "batch_size" : 2,
-            "num_workers": 0,
-            "shuffle": false
-        }
+        "report_to": "tensorboard"
     }
 }

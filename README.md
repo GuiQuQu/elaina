@@ -29,6 +29,45 @@ ddp需要注意的问题
 4. 支持TODO，优先级没有3高, 多卡，数据并行评测，从简单好实现的角度考虑，不要在最后wait各个进程都结束在收集结果，直接在进程内把结果保存到文件中，最后合并文件
 
 ## 9.24
-1. TODO 加上了保存最后ckpt的代码，需要进行测试
-2. 目前不处理保存为safetensors的问题，在评测load model的时候会处理
-3. 写做作测试的代码
+1. TODO 加上了保存最后ckpt的代码，需要进行debug测试, ok
+2. 目前不处理保存为safetensors的问题，在评测load model的时候会处理 ok
+3. 写做作测试的代码,写完了等待debug,支持自定义模型forward 
+4. 写metrics
+5. 目前没有测试过
+
+## 9.29
+1. [x] debug save the last model
+2. [x] debug tester code
+3. [ ] 添加转换所有输入到符合model的device的逻辑(没懂)
+4. [ ] write metrics
+
+## 10.09
+1. 在dataset中添加在test的时候保存的内容,然后将这些内容保存到对应的文件中
+2. metrics应该怎么写(读保存的文件,载入json, 然后计算指标)
+
+
+分类指标
+1. 计算分类的auc
+2. 针对统计结果，找到相同qid的的预测结果，将模型分进行排序，然后
+
+
+```python
+import numpy as np
+import pandas as pd
+
+def calc_auc(y_true, y_pred):
+    pair = list(zip(y_true, y_pred))
+    pair = sorted(pair, key=lambda x: x[1])
+    df = pd.DataFrame([[x[0],x[1],i+1]for i, x in enumerate(pair)]  columns=['y_true', 'y_pred'])
+
+    # 将预测值相同的样本的rank取平均值
+    for k,v in df.y_pred.value_counts().items():
+        if v > 1:
+            rank_mean = df[df.y_pred == k]["rank"].mean()
+            df.loc[df.y_pred == k, "rank"] = rank_mean
+
+    pos_df = df[df.y_true == 1]
+    m = pos_df.shape[0] # 正样本数
+    n = df.shape[0] - m # 负样本数
+    return (pos_df["rank"].sum() - m * (m + 1) / 2) / (m * n)
+```

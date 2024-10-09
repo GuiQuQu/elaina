@@ -1,0 +1,5 @@
+{
+    "seed" : 42,
+    "data_collator": "dataset.default_collator.default_collate",
+    "output_dir":"./outputs/default"
+}

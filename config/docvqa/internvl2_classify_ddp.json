@@ -22,7 +22,7 @@
     "test_dataset": {
         "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
         "dataset_path": "/home/klwang/data/MPDocVQA",
-        "split": "test",
+        "split": "val",
         "preprocess_config": {
             "type": "dataset.docvqa.internvl2_preprocessor.InternVL2Preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
@@ -37,16 +37,31 @@
         "freeze_vision_model": true,
         "freeze_llm_model":false,
         "frzzze_mlp":true,
-        "model_dtype": "bf16",
-        "load_from_ckpt": null
+        "model_dtype": "bf16"
     },
+    "output_dir": "./outputs/MPDocVQA/classify_output",
     "data_collator": "dataset.docvqa.internvl2_preprocessor.internvl2_concat_collator",
+    "tester": {
+        "type": "tester.hf_tester.DefaultTester",
+        "checkpoint_list": [
+            "outputs/MPDocVQA/classify_output/checkpoint-40000/model.safetensors",
+            "outputs/MPDocVQA/classify_output/checkpoint-35000/model.safetensors"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size" : 2,
+            "num_workers": 0,
+            "shuffle": false
+        },
+        "metrics": [
+            {"type": "metrics.auc_metrics.AUCMetrics"}
+        ]
+    },
     "training_args": {
         "do_train": true,
         "do_eval": false,
         "do_predict": false,
         "run_name": "test_run_v1",
-        "output_dir": "./outputs/MPDocVQA/classify_output",
         "overwrite_output_dir": true,
         "bf16": true,
         "gradient_checkpointing": true,
@@ -71,7 +86,6 @@
         "save_total_limit": 5,
         "logging_strategy": "steps",
         "logging_steps": 10,
-        "report_to": "tensorboard",
-        "seed": 42
+        "report_to": "tensorboard"
     }
 }

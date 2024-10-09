@@ -10,8 +10,10 @@ deepspeed==0.15.1
 peft
 timm
 ipykernel
+pandas
 
 # for docvqa
 sentencepiece
 ninja
 flash-attn
+python-Levenshtein

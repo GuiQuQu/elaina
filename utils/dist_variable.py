@@ -1,6 +1,8 @@
 import os
 import torch
 
+import torch.distributed as dist
+
 class _DistVarible:
     rank = 0
     world_size = 1
@@ -11,6 +13,17 @@ class _DistVarible:
         self.rank = int(os.environ.get("RANK", "0"))
         self.world_size = int(os.environ.get("WORLD_SIZE", "1"))
         self.local_rank = int(os.environ.get("LOCAL_RANK", "0"))
+
+        if not dist.is_initialized():
+            self._init_dist()
+    
+    def _init_dist(self):
+        dist.init_process_group(
+            backend='nccl',
+            init_method='env://',
+            world_size=self.world_size,
+            rank=self.rank
+        )    
 
     @property
     def is_main_process(self):

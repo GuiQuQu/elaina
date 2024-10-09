@@ -113,8 +113,8 @@ def main():
     #         if param.requires_grad:
     #             logger.info(f'{name}: {param.size()}')
     
-    from dataset.default_collator import default_collator
-    data_collator = default_collator
+    from dataset.default_collator import default_collate
+    data_collator = default_collate
     if config.get('data_collator', None) is not None:
         data_collator = get_cls_or_func(config['data_collator'])
 

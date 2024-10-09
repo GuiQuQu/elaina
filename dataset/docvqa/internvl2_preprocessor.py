@@ -9,6 +9,7 @@ from dataset.docvqa.preprocess import (
     dynamic_preprocess,
 )
 from dataset.base_preprocessor import BasePreprocessor
+from dataset.default_collator import default_collate2
 from logger import logger
 
 prompt_template = """You are given an image and a question. 
@@ -39,6 +40,7 @@ def concat_collator(batch):
 
 def internvl2_concat_collator(batch):
     assert isinstance(batch, list)
+
     elem = batch[0]
     assert isinstance(elem, dict), f"elem type: {type(elem)}, expected type: dict"
     ret_batch = {}
@@ -63,7 +65,6 @@ class InternVL2Preprocessor(BasePreprocessor):
     def __init__(
         self,
         model_path,
-        extra_save: bool = False,
         num_image_token=256,
         template_name="internlm2-chat",
         dynamic_image_size=True,
@@ -75,8 +76,6 @@ class InternVL2Preprocessor(BasePreprocessor):
         system_message="你是由上海人工智能实验室联合商汤科技开发的书生多模态大模型，英文名叫InternVL, 是一个有用无害的人工智能助手。",
     ) -> None:
         super().__init__()
-
-        self.extra_save = extra_save
 
         self.num_image_token = num_image_token
         self.template_name = template_name
@@ -175,16 +174,15 @@ class InternVL2Preprocessor(BasePreprocessor):
             num_image=1,
         )
         model_inputs = dict()
-        if self.extra_save:
-            model_inputs.update(
-                dict(
-                    qid=qid,
-                    image_path=image_path,
-                    ocr_path=ocr_path,
-                    cls_label=cls_label,
-                    test_conversation=test_conversation,
-                )
-            )
+        extra = dict(
+            qid=qid,
+            image_path=image_path,
+            ocr_path=ocr_path,
+            label=cls_label,
+            test_conversation=test_conversation,
+        )
+        model_inputs.update(extra)
+        self.save_keys = list(extra.keys())
 
         model_inputs.update(
             dict(

@@ -54,6 +54,7 @@ def _freeze_params(module):
     for param in module.parameters():
         param.requires_grad = False
 
+
 # lora 的优先级比freeze的优先级高
 # 就算freeze了，但是lora的设置依然是有效的
 class InternVL2ClassifyModel(nn.Module):
@@ -79,7 +80,9 @@ class InternVL2ClassifyModel(nn.Module):
         )
         self.tokenizer = InternLM2Tokenizer.from_pretrained(model_path)
         self.pad_id = self.tokenizer.pad_token_id
-        self.model.img_context_token_id = self.tokenizer.convert_tokens_to_ids(IMG_CONTEXT_TOKEN)
+        self.model.img_context_token_id = self.tokenizer.convert_tokens_to_ids(
+            IMG_CONTEXT_TOKEN
+        )
         hidden_dim = config.llm_config.hidden_size
         # mlp
         self.classify_mlp = MLP(
@@ -88,6 +91,7 @@ class InternVL2ClassifyModel(nn.Module):
             act_fn="relu",
             add_bias=False,
         )
+        self.classify_mlp = self.classify_mlp.to(get_torch_dtype(model_dtype))
 
         if freeze_vision_model:
             self.model.vision_model = self.model.vision_model.eval()
@@ -100,14 +104,19 @@ class InternVL2ClassifyModel(nn.Module):
 
         # warpped model with lora
         if use_backbone_lora:
-            self.wrap_backbone_lora(use_backbone_lora, 2*use_backbone_lora)
+            self.wrap_backbone_lora(use_backbone_lora, 2 * use_backbone_lora)
         if use_llm_lora:
-            self.wrap_llm_lora(use_llm_lora, 2*use_llm_lora, )
+            self.wrap_llm_lora(
+                use_llm_lora,
+                2 * use_llm_lora,
+            )
 
         self.count_parameters()
 
-    def gradient_checkpointing_enable(self,gradient_checkpointing_kwargs=None):
-        self.model.language_model.gradient_checkpointing_enable(gradient_checkpointing_kwargs)
+    def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
+        self.model.language_model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs
+        )
         # vision model not support gradient checkpointing
         # self.model.vision_model.gradient_checkpointing_enable()
 
@@ -171,9 +180,15 @@ class InternVL2ClassifyModel(nn.Module):
             cls_label: torch.Tensor, [B]
         """
         loss = None
-        outputs = None
-        # breakpoint()
-        test_pixel_values = test_pixel_values.to(device=self.model.device)
+
+        test_pixel_values = test_pixel_values.to(
+            dtype=self.model.dtype, device=self.model.device
+        )
+        test_input_ids = test_input_ids.to(device=self.model.device)
+        test_attention_mask = test_attention_mask.to(device=self.model.device)
+        cls_label = cls_label.to(device=self.model.device)
+        image_flags = image_flags.to(device=self.model.device)
+
         transformer_output = self.model(
             pixel_values=test_pixel_values,
             input_ids=test_input_ids,
@@ -194,31 +209,41 @@ class InternVL2ClassifyModel(nn.Module):
         B, _ = logits.size()
         if cls_label is not None:
             loss_fct = nn.BCEWithLogitsLoss()
-            cls_label = cls_label.view(B, 1).to(device=logits.device,dtype=logits.dtype)
+            cls_label = cls_label.view(B, 1).to(
+                device=logits.device, dtype=logits.dtype
+            )
             loss = loss_fct(logits, cls_label)
         return loss, outputs
 
     def wrap_backbone_lora(self, r=128, lora_alpha=256, lora_dropout=0.05):
         lora_config = LoraConfig(
             r=r,
-            target_modules=['attn.qkv', 'attn.proj', 'mlp.fc1', 'mlp.fc2'],
+            target_modules=["attn.qkv", "attn.proj", "mlp.fc1", "mlp.fc2"],
             lora_alpha=lora_alpha,
             lora_dropout=lora_dropout,
         )
         self.model.vision_model = get_peft_model(self.model.vision_model, lora_config)
         # self.model.vision_model.print_trainable_parameters()
-    
+
     def wrap_llm_lora(self, r=128, lora_alpha=256, lora_dropout=0.05):
         # Determine the target modules based on the architecture of the language model
         #'InternLM2ForCausalLM':
-        target_modules = ['attention.wqkv', 'attention.wo', 'feed_forward.w1', 'feed_forward.w2', 'feed_forward.w3']
+        target_modules = [
+            "attention.wqkv",
+            "attention.wo",
+            "feed_forward.w1",
+            "feed_forward.w2",
+            "feed_forward.w3",
+        ]
         lora_config = LoraConfig(
             r=r,
             target_modules=target_modules,
             lora_alpha=lora_alpha,
             lora_dropout=lora_dropout,
-            task_type='CAUSAL_LM'
+            task_type="CAUSAL_LM",
         )
-        self.model.language_model = get_peft_model(self.model.language_model, lora_config)
+        self.model.language_model = get_peft_model(
+            self.model.language_model, lora_config
+        )
         self.model.language_model.enable_input_require_grads()
         # self.model.language_model.print_trainable_parameters()

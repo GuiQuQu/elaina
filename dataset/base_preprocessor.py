@@ -4,7 +4,7 @@ from typing import List
 
 class BasePreprocessor(abc.ABC):
     def __init__(self) -> None:
-        pass
+        self.save_keys = []
 
     @abc.abstractmethod
     def preprocess(self, item):

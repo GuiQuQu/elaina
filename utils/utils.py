@@ -19,6 +19,10 @@ def get_cls_or_func(path_str: str):
     cls = getattr(module, cls_name)
     return cls
 
+def load_default_config():
+    with open('config/default_config.json', 'r') as f:
+        config = json.load(f)
+    return config
 
 def load_config(config_file):
     """
@@ -26,6 +30,10 @@ def load_config(config_file):
     """
     with open(config_file, "r") as f:
         config = json.load(f)
+    defalut_config = load_default_config()
+    for k,v in defalut_config.items():
+        if k not in config:
+            config[k] = v
     return config
 
 
@@ -39,7 +47,8 @@ def load_state_dict_from_ckpt(ckpt_path, map_location="cpu"):
         state_dict = safetensors.torch.load_file(
             filename=ckpt_path, device=map_location
         )
-
+        return state_dict
+    
     # defaut to torch.load
     state_dict = torch.load(ckpt_path, map_location=map_location)
     return state_dict
@@ -53,15 +62,14 @@ def check_model_state_dict_load(model: torch.nn.Module, state_dict):
     state_dict_keys = set(state_dict.keys())
     missing_keys = model_keys - state_dict_keys
     unexpected_keys = state_dict_keys - model_keys
+
     if len(missing_keys) > 0:
         logger.warning(f"[Model load] Missing keys: {missing_keys}")
     if len(unexpected_keys) > 0:
         logger.warning(f"[Model load] Unexpected keys: {unexpected_keys}")
-    if len(missing_keys) == 0 and len(unexpected_keys) == 0:
-        logger.info("[Model load] Model loaded successfully.")
+        
 
-
-def delete_not_used_key_from_batch(model, batch: Dict[str:Any]):
+def delete_not_used_key_from_batch(model, batch: Dict[str,Any]):
     # 获取函数的参数信息
     signature = inspect.signature(model.forward)
 
@@ -72,7 +80,9 @@ def delete_not_used_key_from_batch(model, batch: Dict[str:Any]):
     param_names = set(param_names)
 
     # 删除不在参数列表中的key,value对
+    delete_dict = {}
     for key in list(batch.keys()):
         if key not in param_names:
+            delete_dict[key] = batch[key]
             del batch[key]
-    return batch
+    return batch, delete_dict

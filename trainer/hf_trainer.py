@@ -6,6 +6,7 @@ from transformers import Trainer,HfArgumentParser,TrainingArguments,set_seed
 from trainer.base_trainer import BaseTrainer
 from utils.utils import get_cls_or_func
 from trainer.trainer_utils import load_dataset,load_model
+from dataset.build import build_dataset
 from logger import logger
 
 def hf_get_last_checkpoint(training_args):
@@ -24,13 +25,15 @@ def hf_get_last_checkpoint(training_args):
             )
     return last_checkpoint
 
+def build_training_args_dict(config):
+    training_args_dict = config.get('training_args', {})
+    training_args_dict['output_dir'] = config.get('output_dir', None)
+    training_args_dict['seed'] = config.get('seed', 42)
+    return training_args_dict
+
 def build_hf_trainer(config):
     hfparser = HfArgumentParser(TrainingArguments)
-    training_args = hfparser.parse_dict(config['training_args'],allow_extra_keys=True)[0]
-    # rewrite output_dir if provided in config
-    output_dir = config.get('output_dir', None)
-    if output_dir is not None:
-        training_args.output_dir = output_dir
+    training_args = hfparser.parse_dict(build_training_args_dict(config),allow_extra_keys=True)[0]
     # Log on each process the small summary:
     logger.warning(
         f'Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}'
@@ -41,9 +44,9 @@ def build_hf_trainer(config):
 
     # load dataset
     train_dataset_config = config.get('train_dataset', None)
-    train_dataset = load_dataset(train_dataset_config,split='train')
+    train_dataset = build_dataset(train_dataset_config,split='train')
     eval_dataset_config = config.get('eval_dataset', None)
-    eval_dataset = load_dataset(eval_dataset_config,split='eval')
+    eval_dataset = build_dataset(eval_dataset_config,split='eval')
     if train_dataset is None:
         raise ValueError('No training dataset provided.')
 
@@ -51,8 +54,8 @@ def build_hf_trainer(config):
     model_config = config.get('model', None)
     model = load_model(model_config)
 
-    from dataset.default_collator import default_collator
-    data_collator = default_collator
+    from dataset.default_collator import default_collate
+    data_collator = default_collate
     if config.get('data_collator', None) is not None:
         data_collator = get_cls_or_func(config['data_collator'])
 
@@ -103,5 +106,5 @@ class HFTrainer(BaseTrainer):
         self.trainer.log_metrics('train', metrics)
         self.trainer.save_metrics('train', metrics)
         self.trainer.save_state()
-        self.trainer._save(output_dir=os.path.join(self.training_args.output_dir, 'checkpoint-final'))
+        self.trainer._save(output_dir=os.path.join(self.training_args.output_dir, f'checkpoint-{self.trainer.state.global_step}'))
 
