@@ -1,7 +1,7 @@
+# torch==2.1.2
+# torchvision==0.16.2 
+# torchaudio==2.1.2
 transformers==4.37.2
-torch==2.1.2
-torchvision==0.16.2 
-torchaudio==2.1.2
 einops
 tensorboard
 accelerate==0.34.2

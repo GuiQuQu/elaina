@@ -58,6 +58,7 @@
             {"type": "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics"}
         ]
     },
+    "trainer": "trainer.hf_trainer.HFTrainer",
     "training_args": {
         "do_train": true,
         "do_eval": false,

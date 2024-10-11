@@ -19,7 +19,7 @@ class MPDocVQAVqaDataset(BaseDataset):
         self,
         preprocess_config,
         dataset_path: str,
-        classify_result_path: str = None,
+        classify_result_path: str = None,  # 暂时不使用这部分内容，数据部分没有分类的score
         split: str = "train",
     ) -> None:
         super().__init__(preprocess_config)
@@ -37,7 +37,6 @@ class MPDocVQAVqaDataset(BaseDataset):
     def prepare_data(self):
         data = open_data(self.dataset_path)
         ret_data = []
-        classify_result = self.groupby_classify_result()
 
         for i, item in enumerate(data):
             qid = item["questionId"]
@@ -45,19 +44,16 @@ class MPDocVQAVqaDataset(BaseDataset):
             page_ids = item["page_ids"]
             answers = item["answers"]
             answer_page_idx = item["answer_page_idx"]
-            classify_result_item:dict = classify_result[qid]
             
             documents = []
             for page_id in page_ids:
                 image_path = os.path.join(self.image_dir, page_id + ".jpg")
                 ocr_path = os.path.join(self.ocr_dir, page_id + ".json")
-                score = classify_result_item[page_id]
                 documents.append(
                     dict(
                         page_id=page_id,
                         image_path=image_path,
                         ocr_path=ocr_path,
-                        score=score,
                     )
                 )
             ret_item = dict(
@@ -69,6 +65,7 @@ class MPDocVQAVqaDataset(BaseDataset):
             )
             ret_data.append(ret_item)
         return ret_data
+
 
     def groupby_classify_result(self) -> Dict[str, List[Dict[str, Any]]]:
 
