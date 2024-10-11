@@ -11,6 +11,7 @@ peft
 timm
 ipykernel
 pandas
+colorlog
 
 # for docvqa
 sentencepiece

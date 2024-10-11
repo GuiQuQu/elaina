@@ -1,0 +1,7 @@
+{
+  "result_path": "/home/klwang/code/elaina/outputs/MPDocVQA/trainer_test_output/test_result/checkpoint-35000-result.json",
+  "metrics.auc_metrics.AUCMetrics": 0.5625,
+  "metrics.auc_metrics.AUCMetrics_details": "AUCMetrics: 56.25%",
+  "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics": 0.6666666666666666,
+  "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics_details": "66.67%[2|3]"
+}

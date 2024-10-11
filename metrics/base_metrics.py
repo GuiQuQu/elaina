@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import os
 import json
+from typing import Tuple
 
 
 def load_json(json_path):
@@ -13,8 +14,9 @@ class BaseMetrics(ABC):
     def __init__(self, result_path):
         self.result_path = result_path
         self.result = self.load_result()
+
     @abstractmethod
-    def compute_metrics(self):
+    def compute_metrics(self) -> Tuple[float, str]:
         raise NotImplementedError
 
     def load_result(self):

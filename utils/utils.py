@@ -26,7 +26,7 @@ def load_default_config():
 
 def load_config(config_file):
     """
-    Load a json config file
+    Load a json config file, and fill in the missing keys with default values
     """
     with open(config_file, "r") as f:
         config = json.load(f)

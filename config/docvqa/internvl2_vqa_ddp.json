@@ -1,10 +1,10 @@
 {
     "train_dataset": {
-        "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
         "dataset_path": "/home/klwang/data/MPDocVQA",
         "split": "train",
         "preprocess_config": {
-            "type": "dataset.docvqa.mpdocvqa_classify_internvl2_preprocessor.MPDocVQAClassifyInternVL2Preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
             "max_seq_length": 2048
         }
@@ -14,7 +14,7 @@
         "dataset_path": "/home/klwang/data/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "dataset.docvqa.mpdocvqa_classify_internvl2_preprocessor.MPDocVQAClassifyInternVL2Preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
             "max_seq_length": 2048
         }
@@ -24,13 +24,13 @@
         "dataset_path": "/home/klwang/data/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "dataset.docvqa.mpdocvqa_classify_internvl2_preprocessor.MPDocVQAClassifyInternVL2Preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
             "max_seq_length": 2048
         }
     },
     "model": {
-        "type": "models.docvqa.classify_model.InternVL2ClassifyModel",
+        "type": "models.docvqa.internvl2_vqa_model.InternVL2VQAModel",
         "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
         "use_backbone_lora":0,
         "use_llm_lora":0,
@@ -39,8 +39,8 @@
         "frzzze_mlp":true,
         "model_dtype": "bf16"
     },
-    "output_dir": "./outputs/MPDocVQA/classify_output",
-    "data_collator": "dataset.docvqa.mpdocvqa_classify_internvl2_preprocessor.internvl2_concat_collator",
+    "output_dir": "./outputs/MPDocVQA/vqa_output",
+    "data_collator": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
     "tester": {
         "type": "tester.hf_tester.DefaultTester",
         "checkpoint_list": [
@@ -62,7 +62,7 @@
         "do_train": true,
         "do_eval": false,
         "do_predict": false,
-        "run_name": "test_run_v1",
+        "run_name": "train_run_v1",
         "overwrite_output_dir": true,
         "bf16": true,
         "gradient_checkpointing": true,
@@ -82,7 +82,7 @@
         "warmup_ratio": 0.1,
         "evaluation_strategy": "no",
         "save_strategy": "steps",
-        "save_steps": 5000,
+        "save_steps": 2500,
         "save_safetensors": true,
         "save_total_limit": 5,
         "logging_strategy": "steps",

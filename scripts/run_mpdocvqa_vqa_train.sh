@@ -1,0 +1,1 @@
+bash run_main.sh --config_file config/docvqa/internvl2_vqa_ddp.json --do_train

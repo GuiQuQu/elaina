@@ -9,7 +9,6 @@ from dataset.docvqa.preprocess import (
     dynamic_preprocess,
 )
 from dataset.base_preprocessor import BasePreprocessor
-from dataset.default_collator import default_collate2
 from logger import logger
 
 prompt_template = """You are given an image and a question. 
@@ -61,7 +60,7 @@ def internvl2_concat_collator(batch):
     return ret_batch
 
 
-class InternVL2Preprocessor(BasePreprocessor):
+class MPDocVQAClassifyInternVL2Preprocessor(BasePreprocessor):
     def __init__(
         self,
         model_path,

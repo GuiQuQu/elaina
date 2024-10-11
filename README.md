@@ -39,7 +39,7 @@ ddp需要注意的问题
 1. [x] debug save the last model
 2. [x] debug tester code
 3. [ ] 添加转换所有输入到符合model的device的逻辑(没懂)
-4. [ ] write metrics
+4. [x] write metrics
 
 ## 10.09
 1. 在dataset中添加在test的时候保存的内容,然后将这些内容保存到对应的文件中
@@ -50,24 +50,14 @@ ddp需要注意的问题
 1. 计算分类的auc
 2. 针对统计结果，找到相同qid的的预测结果，将模型分进行排序，然后
 
+## 10.10
+1. 等litao跑完了之后debug完整eval+metrics的代码
+2. debug lora训练是哪里出了问题
+3. 开始跑一个ckpt的eval，看看分类的结果
+4. 看看autodl上的卡的价格
 
-```python
-import numpy as np
-import pandas as pd
+目前看，没有用ocr信息，模型的分类准确率已经到85%了
 
-def calc_auc(y_true, y_pred):
-    pair = list(zip(y_true, y_pred))
-    pair = sorted(pair, key=lambda x: x[1])
-    df = pd.DataFrame([[x[0],x[1],i+1]for i, x in enumerate(pair)]  columns=['y_true', 'y_pred'])
+## 10.11
+1. 训练生成答案的模型，
 
-    # 将预测值相同的样本的rank取平均值
-    for k,v in df.y_pred.value_counts().items():
-        if v > 1:
-            rank_mean = df[df.y_pred == k]["rank"].mean()
-            df.loc[df.y_pred == k, "rank"] = rank_mean
-
-    pos_df = df[df.y_true == 1]
-    m = pos_df.shape[0] # 正样本数
-    n = df.shape[0] - m # 负样本数
-    return (pos_df["rank"].sum() - m * (m + 1) / 2) / (m * n)
-```
