@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 import json
 import os
 from tqdm import tqdm
@@ -63,7 +63,7 @@ class DefaultTester:
                 save_path, save_path.replace("result.json", "metrics.json")
             )
 
-    def run_model(self, model, batch: dict):
+    def run_model(self, model, batch: dict) -> Tuple[float,List[Any]]:
         model_input_batch, delete_batch = delete_not_used_key_from_batch(model, batch)
         outputs = model(**model_input_batch)
         batch.update(delete_batch)
@@ -87,7 +87,7 @@ class DefaultTester:
             json.dump(metrics_result, f, ensure_ascii=False, indent=2)
 
     def save_result(self, result, save_path):
-        with open(save_path, "w") as f:
+        with open(save_path, "w", encoding='utf-8') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
     @torch.no_grad()

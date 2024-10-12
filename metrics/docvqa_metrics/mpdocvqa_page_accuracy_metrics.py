@@ -12,6 +12,7 @@ class MPDocVQPageAccuracyMetrics(BaseMetrics):
         self.label_key = label_key
 
     def compute_metrics(self) -> Tuple[float,str]:
+        
         # 按照qid做groupby
         qid2items = defaultdict(list)
         for item in self.result:

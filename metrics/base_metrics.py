@@ -17,6 +17,9 @@ class BaseMetrics(ABC):
 
     @abstractmethod
     def compute_metrics(self) -> Tuple[float, str]:
+        """
+            Return the metrics value and the details of the value
+        """
         raise NotImplementedError
 
     def load_result(self):

@@ -10,7 +10,7 @@
         }
     },
     "val_dataset": {
-        "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
         "dataset_path": "/root/autodl-tmp/MPDocVQA",
         "split": "val",
         "preprocess_config": {
@@ -20,42 +20,50 @@
         }
     },
     "test_dataset": {
-        "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
-        "dataset_path": "/root/autodl-tmp/data/MPDocVQA",
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_test_preprocessor.MPDocVQAVQAInternVL2TestPreprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+            "classify_result_path": "outputs/MPDocVQA/classify_output/test_result/checkpoint-35000-result.json",
             "max_seq_length": 2048
         }
     },
     "model": {
         "type": "models.docvqa.internvl2_vqa_model.InternVL2VQAModel",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "use_backbone_lora":0,
-        "use_llm_lora":0,
+        "use_backbone_lora": 0,
+        "use_llm_lora": 0,
         "freeze_vision_model": true,
-        "freeze_llm_model":false,
-        "frzzze_mlp":true,
+        "freeze_llm_model": false,
+        "frzzze_mlp": true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/vqa_output",
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5",
     "data_collator": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
     "tester": {
-        "type": "tester.hf_tester.DefaultTester",
+        "type": "tester.internvl2_tester.InternVL2Tester",
+        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+        "output_dir": "outputs/MPDocVQA/vqa_output/test_result",
+        "generation_config": {
+            "max_new_tokens": 128,
+            "do_sample": false
+        },
         "checkpoint_list": [
-            "outputs/MPDocVQA/classify_output/checkpoint-40000/model.safetensors",
-            "outputs/MPDocVQA/classify_output/checkpoint-35000/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5/checkpoint-1000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5/checkpoint-4000/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
-            "batch_size" : 8,
+            "batch_size": 8,
             "num_workers": 0,
             "shuffle": false
         },
         "metrics": [
-            {"type": "metrics.auc_metrics.AUCMetrics"},
-            {"type": "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics"}
+            {
+                "type": "metrics.docvqa_metrics.anls_metrics.ANLSMetrics"
+            }
         ]
     },
     "trainer": "trainer.hf_trainer.HFTrainer",
@@ -67,7 +75,9 @@
         "overwrite_output_dir": true,
         "bf16": true,
         "gradient_checkpointing": true,
-        "gradient_checkpointing_kwargs":{"use_reentrant": false},
+        "gradient_checkpointing_kwargs": {
+            "use_reentrant": false
+        },
         "remove_unused_columns": true,
         "num_train_epochs": 1,
         "per_device_train_batch_size": 1,
@@ -76,7 +86,7 @@
         "dataloader_num_workers": 0,
         "gradient_accumulation_steps": 8,
         "optim": "adamw_torch",
-        "learning_rate": 4e-5,
+        "learning_rate": 1e-5,
         "max_grad_norm": 1.0,
         "weight_decay": 0.01,
         "lr_scheduler_type": "cosine",

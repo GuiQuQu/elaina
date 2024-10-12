@@ -1,9 +1,11 @@
 """
-    训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
+    internvl2,测试的，需要读取分类结果文件, 然后提供选择的图像 preprocessor
 """
+from collections import defaultdict
 import random
 from PIL import Image
 import torch
+import json
 
 from models.docvqa.internvl2.tokenization_internlm2 import InternLM2Tokenizer
 from dataset.docvqa.preprocess import (
@@ -45,10 +47,11 @@ def internvl2_concat_collator(batch):
     return ret_batch
 
 
-class MPDocVQAVQAInternVL2Preprocessor(BasePreprocessor):
+class MPDocVQAVQAInternVL2TestPreprocessor(BasePreprocessor):
     def __init__(
         self,
         model_path,
+        classify_result_path:str,
         num_image_token=256,
         template_name="internlm2-chat",
         dynamic_image_size=True,
@@ -83,13 +86,25 @@ class MPDocVQAVQAInternVL2Preprocessor(BasePreprocessor):
         )
         self.tokenizer.model_max_length = max_seq_length
         # image
-        # sft训练也不考虑做图像增强变换
+        # sft训练不考虑做图像增强变换
         self.train_transform = build_transform(
             is_train=False, input_size=448, pad2square=pad2square
         )
         self.test_transform = build_transform(
             is_train=False, input_size=448, pad2square=pad2square
         )
+        self.qid2classifyitems = self.groupby_classify_result(classify_result_path)
+
+    def groupby_classify_result(self, classify_result_path):
+        qid2items = defaultdict(dict)
+        with open(classify_result_path, 'r', encoding='utf-8') as f:
+            classify_result = json.load(f)
+        for item in classify_result:
+            qid = item['qid']
+            page_id = item['image_path'].split('/')[-1].split('.')[0]
+            qid2items[qid][page_id] = item['model_output']
+        return qid2items
+
 
     def get_prompt(self, answer, **kwargs):
         prompt = prompt_template.format(**kwargs)
@@ -120,57 +135,49 @@ class MPDocVQAVQAInternVL2Preprocessor(BasePreprocessor):
         return pixel_values, num_tiles
 
     def preprocess(self, item):
-
         qid = item["qid"]
         question = item["question"]
         documents = item["documents"]
         true_answer_page_idx = item["true_answer_page_idx"]
-        true_page = documents[true_answer_page_idx]
-        true_image_path = true_page["image_path"]
-        true_ocr_path = true_page["ocr_path"]
         answers = item["answers"]
-        # 选择正确page_id做单图任务回答
-        pixel_values, num_tiles = self.get_pixel_values(
-            true_image_path, self.train_transform
-        )
-        test_pixel_values, _ = self.get_pixel_values(true_image_path, self.test_transform)
+        classify_items:dict = self.qid2classifyitems[qid]
+        # 排序根据score排序所有的page_id,选择返回分数最高的page_id
+        # add score to documents
+        for i, doc in enumerate(documents):
+            page_id = doc['page_id']
+            doc['is_true_page'] = i == true_answer_page_idx
+            if page_id in classify_items:
+                doc['score'] = classify_items[page_id]
+            else:
+                raise ValueError(f"page_id: {page_id} not found in classify_result")
+        documents = sorted(documents, key=lambda x: x['score'], reverse=True)
+        top1_image_path = documents[0]['image_path']
+        top1_ocr_path = documents[0]['ocr_path']
+        test_pixel_values, num_tiles = self.get_pixel_values(top1_image_path, self.test_transform)
         train_conversation, test_conversation = self.get_prompt(
             answer=random.choice(answers), image="<image>", question=question
         )
-        train_inputs = preprocess_internlm(
-            template_name=self.template_name,
-            sources=[train_conversation],
-            tokenizer=self.tokenizer,
-            num_image_token_list=[
-                self.num_image_token * num_tile for num_tile in num_tiles
-            ],
-            text_only=False,
-            ds_name="train_mpdocvqa_vqa",
-            system_message=self.system_message,
-            num_image=1,
-        )
         model_inputs = dict()
-        test_question = test_conversation[0]["value"]
         extra = dict(
             qid=qid,
-            true_image_path=true_image_path,
-            true_ocr_path=true_ocr_path,
             answers=answers,
             documents=documents,
-            # train_conversation=train_conversation,
-            test_conversation=test_conversation,
+            
         )
         model_inputs.update(extra)
-        self.save_keys = list(extra.keys())
+        self.save_keys = ['qid', 'answers', 'documents','test_conversation']
+
         model_inputs.update(
             dict(
-                pixel_values=pixel_values,
-                input_ids=train_inputs["input_ids"].squeeze(),
-                attention_mask=train_inputs["attention_mask"].squeeze(),
-                labels=train_inputs["labels"].squeeze(),
-                image_flags=torch.tensor([1] * pixel_values.size(0), dtype=torch.long),
+                # pixel_values=pixel_values,
+                # input_ids=train_inputs["input_ids"].squeeze(),
+                # attention_mask=train_inputs["attention_mask"].squeeze(),
+                # labels=train_inputs["labels"].squeeze(),
+                # image_flags=torch.tensor([1] * pixel_values.size(0), dtype=torch.long),
+                test_conversation=test_conversation,
                 test_pixel_values=test_pixel_values,
                 num_tiles=num_tiles[0], # 单图，因此只选择第一个图像被划分出来的patch数量
             )
         )
+        
         return model_inputs
