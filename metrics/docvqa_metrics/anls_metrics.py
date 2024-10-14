@@ -7,18 +7,21 @@ from logger import logger
 
 class ANLSMetrics(BaseMetrics):
     def __init__(
-        self, result_path, pred_replace_star: bool = False, pred_replace_n: bool = False
+        self, result_path, pred_replace_star: bool = False, pred_replace_n: bool = False,
+        pred_key:str = "model_output", answers_key:str = "answers"
     ):
         super().__init__(result_path)
         self.pred_replace_star = pred_replace_star
         self.pred_replace_n = pred_replace_n
+        self.pred_key = pred_key
+        self.answers_key = answers_key
 
     def compute_metrics(self) -> Tuple[float, str]:
         all_anls = 0.0
         metrics_details = []
         for _, item in enumerate(self.result):
-            answers = item['answers']
-            pred = item['model_output']
+            answers = item[self.answers_key]
+            pred = item[self.pred_key]
             single_anls = self._ls_multiple(pred, answers)
             all_anls += single_anls
             item['anls'] = single_anls

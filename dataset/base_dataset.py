@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 from torch.utils.data import Dataset
 
 from utils.utils import get_cls_or_func
@@ -49,6 +49,5 @@ class BaseDataset(Dataset):
     def __len__(self) -> int:
         return len(self.data)
 
-    def prepare_data(self):
-        self.data = []
+    def prepare_data(self) -> List[Dict[str,Any]]:
         raise NotImplementedError

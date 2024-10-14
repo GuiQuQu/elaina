@@ -4,3 +4,4 @@
 outputs
 abc.json
 tmp.ipynb
+*.json

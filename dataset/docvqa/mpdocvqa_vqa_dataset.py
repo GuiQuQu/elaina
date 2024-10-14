@@ -19,7 +19,6 @@ class MPDocVQAVqaDataset(BaseDataset):
         self,
         preprocess_config,
         dataset_path: str,
-        classify_result_path: str = None,  # 暂时不使用这部分内容，数据部分没有分类的score
         split: str = "train",
     ) -> None:
         super().__init__(preprocess_config)
@@ -27,12 +26,6 @@ class MPDocVQAVqaDataset(BaseDataset):
         self.dataset_path = os.path.join(dataset_path, f"{split}.json")
         self.ocr_dir = os.path.join(dataset_path, "ocr")
         self.image_dir = os.path.join(dataset_path, "images")
-        if classify_result_path is None:
-            self.classify_result_path = os.path.join(
-                dataset_path, f"classify_result_{split}.json"
-            )
-        else:
-            self.classify_result_path = classify_result_path
 
     def prepare_data(self):
         data = open_data(self.dataset_path)

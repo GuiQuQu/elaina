@@ -105,33 +105,6 @@ class InternVL2VQAModel(nn.Module):
             f"training parameters: {traing_parms / 10**6} M, all parameters: {all_parms / 10**6} M"
         )
 
-    def get_last_one_hidden_states(
-        self, hidden_states, input_ids, padding_on_left=False
-    ):
-        bsz, _, _ = hidden_states.size()
-
-        padding_on_left = padding_on_left
-
-        if padding_on_left:
-            return hidden_states[:, -1, :].view(bsz, -1)
-        else:
-            device = input_ids.device
-            temp_pad = torch.tensor([self.pad_id] * bsz).long().view(bsz, -1)  # [bsz,1]
-            temp_pad = temp_pad.to(device)
-            temp_input_ids = torch.cat([input_ids, temp_pad], dim=1)
-            bsz_idx, last_idx = [], []
-            for i in range(bsz):
-                temp = temp_input_ids[i]
-                bsz_idx.append(i)
-                t = torch.nonzero(temp == self.pad_id, as_tuple=True)
-                last_idx.append(t[0].min() - 1)
-
-            assert all([i >= 0 for i in last_idx])
-
-            bsz_idx = torch.tensor(bsz_idx).to(device)
-            last_idx = torch.tensor(last_idx).to(device)
-            return hidden_states[bsz_idx, last_idx, :]
-
     def forward(
         self,
         pixel_values,

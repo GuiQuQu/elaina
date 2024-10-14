@@ -5,7 +5,7 @@ from typing import Tuple
 
 
 def load_json(json_path):
-    with open(json_path, "r") as f:
+    with open(json_path, "r", encoding='utf-8') as f:
         result = json.load(f)
     return result
 
