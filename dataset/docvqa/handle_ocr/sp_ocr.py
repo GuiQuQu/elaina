@@ -97,23 +97,6 @@ def segments2lines(segments: list):
     result = [sorted(line, key=lambda x: x["bbox"].left) for line in result]
     return result
 
-def transform_ocr2layout(ocr_path):
-    ocr_data = sp_open_ocr_data(ocr_path)
-    if len(ocr_data["segments"]) == 0:
-        return ""
-    
-    # 划分行
-    ocr_data["lines"] = segments2lines(ocr_data["segments"])
-    # 行内划分成segments和空格,来复制原本文档的布局
-    page_width = ocr_data["page_width"]
-    # 拼接成文本并返回
-
-def line2text(line: list, line_width: int):
-    """
-        line : list, 每个元素是一个dict,包含text和bbox,表示一个segment
-        line_width : int, 行的宽度,字符数量
-    """
-    pass
 
 def _split_line_from_data(data: List[dict]):
     """

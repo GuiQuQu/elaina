@@ -14,7 +14,8 @@ from dataset.docvqa.preprocess import (
 )
 from dataset.base_preprocessor import BasePreprocessor
 from logger import logger
-
+from dataset.docvqa.ocr2layout.sp_ocr2layout import transform_ocr2layout
+from dataset.docvqa.docvqa_utils import truncate_layout
 prompt_template = """You are given an image and a question. 
 Image: {image}
 Question: {question}
@@ -22,10 +23,10 @@ Please answer the question based on the image.
 You should extract the answer from the text in the image without changing the order and form of the words.
 Answer: """
 
-prompt_template_add_ocr = """You are given an image,its corresponding string layout and a question.
+prompt_template_add_layout = """You are given an image,its corresponding string layout and a question.
 Image: {image}
 String Layout: 
-{ocr}
+{layout}
 Question: {question}
 Please answer the question based on the image and its its corresponding string layout.
 You should extract the answer from the text in the image without changing the order and form of the words.
@@ -54,7 +55,7 @@ def internvl2_concat_collator(batch):
     return ret_batch
 
 
-class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
+class DocVQAVqaInternVL2OCRPreprocessor(BasePreprocessor):
     def __init__(
         self,
         model_path,
@@ -65,7 +66,8 @@ class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
         min_dynamic_patch=1,
         max_dynamic_patch=6,
         pad2square=False,
-        max_seq_length=1024,
+        max_layout_length=1024,
+        max_seq_length=2048,
         system_message="你是由上海人工智能实验室联合商汤科技开发的书生多模态大模型，英文名叫InternVL, 是一个有用无害的人工智能助手。",
     ) -> None:
         super().__init__()
@@ -78,6 +80,7 @@ class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
         self.max_dynamic_patch = max_dynamic_patch
         self.pad2square = pad2square
         self.max_seq_length = max_seq_length
+        self.max_layout_length = max_layout_length
         self.system_message = system_message
 
         logger.info(f"[Preprocessor] num_image_token: {num_image_token}")
@@ -101,7 +104,7 @@ class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
         )
 
     def get_prompt(self, answer, **kwargs):
-        prompt = prompt_template.format(**kwargs)
+        prompt = prompt_template_add_layout.format(**kwargs)
         train_ret = [
             {"from": "human", "value": prompt},
             {"from": "gpt", "value": answer},
@@ -129,7 +132,11 @@ class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
         return pixel_values, num_tiles
 
     def transform_ocr2layout(self, ocr_path):
-        pass
+        layout = transform_ocr2layout(ocr_path, placeholder=" ")
+        layout, is_truncated = truncate_layout(
+            layout, tokenizer=self.tokenizer, max_token_length=self.max_layout_length
+        )
+        return layout
 
     def preprocess(self, item):
 
@@ -143,9 +150,9 @@ class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
             image_path, self.train_transform
         )
         test_pixel_values, _ = self.get_pixel_values(image_path, self.test_transform)
-        ocr = self.transform_ocr2layout(ocr_path)
+        layout = self.transform_ocr2layout(ocr_path)
         train_conversation, test_conversation = self.get_prompt(
-            answer=random.choice(answers), image="<image>", question=question,ocr = ocr
+            answer=random.choice(answers), image="<image>", question=question,layout=layout
         )
         train_inputs = preprocess_internlm(
             template_name=self.template_name,

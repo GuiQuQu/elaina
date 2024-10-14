@@ -1,4 +1,4 @@
 
 bash run_main.sh \
-    --config_file config/docvqa/trainer_run_test.json \
+    --config_file config/docvqa/internvl2_mpdocvqa_classify_ddp.json \
     --do_train

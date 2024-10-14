@@ -1,1 +1,1 @@
-bash run_main.sh --config_file config/docvqa/internvl2_vqa_ddp_autodl.json --do_train
+bash run_main.sh --config_file config/docvqa/internvl2_mpdocvqa_vqa_ddp_autodl.json --do_train

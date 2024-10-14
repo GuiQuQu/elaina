@@ -45,7 +45,7 @@
     "tester": {
         "type": "tester.internvl2_tester.InternVL2Tester",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "output_dir": "outputs/MPDocVQA/vqa_output/test_result",
+        "output_dir": "outputs/MPDocVQA/vqa_output_1r1e5/test_result",
         "generation_config": {
             "max_new_tokens": 128,
             "do_sample": false
