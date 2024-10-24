@@ -181,6 +181,7 @@ def line2text_by_line_char_cnt(
     for i, seg in enumerate(line):
         text:str = seg['text']
         bbox:BBox = seg['bbox']
+    raise NotImplementedError
 
 def line2text_by_unit_char_cnt(
     line: list, unit_width_char_cnt: float, page_width, align="left", placeholder=" "
