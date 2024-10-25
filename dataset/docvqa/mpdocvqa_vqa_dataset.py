@@ -35,9 +35,10 @@ class MPDocVQAVqaDataset(BaseDataset):
             qid = item["questionId"]
             question = item["question"]
             page_ids = item["page_ids"]
-            answers = item["answers"]
-            answer_page_idx = item["answer_page_idx"]
-            
+            # answers = item["answers"]
+            answers = item.get("answers", ["fake label"])
+            # answer_page_idx = item["answer_page_idx"]
+            answer_page_idx = item.get("answer_page_idx", -1)            
             documents = []
             for page_id in page_ids:
                 image_path = os.path.join(self.image_dir, page_id + ".jpg")

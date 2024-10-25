@@ -26,8 +26,10 @@ class MPDocVQAClassifyDataset(BaseDataset):
             qid = item["questionId"]
             question = item["question"]
             page_ids = item["page_ids"]
-            answers = item["answers"]
-            answer_page_idx = item["answer_page_idx"]
+            # answers = item["answers"]
+            answers = item.get("answers", ["fake label"])
+            # answer_page_idx = item["answer_page_idx"]
+            answer_page_idx = item.get("answer_page_idx", -1)
             for j, page_id in enumerate(page_ids):
                 ret_item = dict(
                     qid=qid,
