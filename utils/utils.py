@@ -86,3 +86,40 @@ def delete_not_used_key_from_batch(model, batch: Dict[str,Any]):
             delete_dict[key] = batch[key]
             del batch[key]
     return batch, delete_dict
+
+def check_environment():
+    """
+    Check the environment of the current running code
+    """
+    import torch
+    import platform
+    import numpy as np
+    import torch
+    import torch.cuda
+    import torch.backends.cudnn as cudnn
+
+    logger.info(f"Python version: {platform.python_version()}")
+    logger.info(f"PyTorch version: {torch.__version__}")
+    logger.info(f"PyTorch CUDA version: {torch.version.cuda}")
+    logger.info(f"PyTorch cuDNN version: {cudnn.version()}")
+    logger.info(f"NumPy version: {np.__version__}")
+
+    if torch.cuda.is_available():
+        logger.info(f"GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        logger.info("GPU: Not available")
+    
+    # check local cuda version
+    import torch.utils
+    import torch.utils.cpp_extension as ex
+    import os
+    import re
+    import subprocess
+    CUDA_HOME = ex.CUDA_HOME
+    logger.info(f"CUDA_HOME:{ex.CUDA_HOME}")
+    if os.path.exists(CUDA_HOME):
+        nvcc = os.path.join(CUDA_HOME, 'bin', 'nvcc')
+        SUBPROCESS_DECODE_ARGS = ()
+        cuda_version_str = subprocess.check_output([nvcc, '--version']).strip().decode(*SUBPROCESS_DECODE_ARGS)
+        local_cuda_version = re.search(r'release (\d+[.]\d+)', cuda_version_str)
+        logger.info(f"Local CUDA version: {local_cuda_version.group(1)}")

@@ -28,7 +28,7 @@ class DefaultTester:
         test_dataset,
         output_dir,
         dataloader_config,
-        metrics,
+        metrics = [],
         max_steps: int = -1,
         checkpoint_list: List[str] = [],
     ):

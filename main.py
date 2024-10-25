@@ -5,7 +5,10 @@ from arguments import get_args,get_config_from_args
 from trainer.build import build_trainer
 from tester.build import build_tester
 
+from utils.utils import check_environment
+
 def main():
+    check_environment()
     args = get_args()
     config = get_config_from_args(args)
     set_seed(config['seed'])
