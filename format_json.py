@@ -1,5 +1,5 @@
 import json
-json_path = "examples/test.json"
+json_path = "/test.json"
 
 with open(json_path, "r", encoding='utf-8') as f:
     data = json.load(f)

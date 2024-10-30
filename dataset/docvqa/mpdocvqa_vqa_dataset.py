@@ -40,11 +40,12 @@ class MPDocVQAVqaDataset(BaseDataset):
             # answer_page_idx = item["answer_page_idx"]
             answer_page_idx = item.get("answer_page_idx", -1)            
             documents = []
-            for page_id in page_ids:
+            for idx, page_id in enumerate(page_ids):
                 image_path = os.path.join(self.image_dir, page_id + ".jpg")
                 ocr_path = os.path.join(self.ocr_dir, page_id + ".json")
                 documents.append(
                     dict(
+                        page_idx = idx,
                         page_id=page_id,
                         image_path=image_path,
                         ocr_path=ocr_path,

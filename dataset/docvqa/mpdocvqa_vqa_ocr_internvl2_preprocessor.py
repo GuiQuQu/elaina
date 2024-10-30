@@ -1,6 +1,7 @@
 """
     训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
 """
+
 import random
 from PIL import Image
 import torch
@@ -17,12 +18,12 @@ from dataset.docvqa.docvqa_utils import truncate_layout
 from dataset.docvqa.ocr2layout.mp_ocr2layout import transform_ocr2layout
 from logger import logger
 
-prompt_template = """You are given an image and a question. 
-Image: {image}
-Question: {question}
-Please answer the question based on the image.
-You should extract the answer from the text in the image without changing the order and form of the words.
-Answer: """
+# prompt_template = """You are given an image and a question.
+# Image: {image}
+# Question: {question}
+# Please answer the question based on the image.
+# You should extract the answer from the text in the image without changing the order and form of the words.
+# Answer: """
 
 prompt_template_add_layout = """You are given an image,its corresponding string layout and a question.
 Image: {image}
@@ -83,7 +84,7 @@ class MPDocVQAVQAOCRInternVL2Preprocessor(BasePreprocessor):
         )
 
     def get_prompt(self, answer, **kwargs):
-        prompt = prompt_template.format(**kwargs)
+        prompt = prompt_template_add_layout.format(**kwargs)
         train_ret = [
             {"from": "human", "value": prompt},
             {"from": "gpt", "value": answer},
@@ -112,7 +113,12 @@ class MPDocVQAVQAOCRInternVL2Preprocessor(BasePreprocessor):
 
     def transform_ocr2layout(self, ocr_path):
         layout = transform_ocr2layout(ocr_path)
-        layout, is_truncated = truncate_layout(layout, self.max_layout_length)
+        layout, is_truncated = truncate_layout(
+            layout, tokenizer=self.tokenizer, max_token_length=self.max_layout_length
+        )
+        if (is_truncated):
+            ocr_name = ocr_path.split("/")[-1]
+            logger.info(f"[Preprocessor] layout({ocr_name}) is truncated")
         return layout
 
     def preprocess(self, item):
@@ -129,10 +135,16 @@ class MPDocVQAVQAOCRInternVL2Preprocessor(BasePreprocessor):
         pixel_values, num_tiles = self.get_pixel_values(
             true_image_path, self.train_transform
         )
-        test_pixel_values, _ = self.get_pixel_values(true_image_path, self.test_transform)
+        test_pixel_values, _ = self.get_pixel_values(
+            true_image_path, self.test_transform
+        )
+        
         layout = self.transform_ocr2layout(true_ocr_path)
         train_conversation, test_conversation = self.get_prompt(
-            answer=random.choice(answers), image="<image>", question=question, layout = layout
+            answer=random.choice(answers),
+            image="<image>",
+            question=question,
+            layout=layout,
         )
         train_inputs = preprocess_internlm(
             template_name=self.template_name,
@@ -167,7 +179,9 @@ class MPDocVQAVQAOCRInternVL2Preprocessor(BasePreprocessor):
                 labels=train_inputs["labels"].squeeze(),
                 image_flags=torch.tensor([1] * pixel_values.size(0), dtype=torch.long),
                 test_pixel_values=test_pixel_values,
-                num_tiles=num_tiles[0], # 单图，因此只选择第一个图像被划分出来的patch数量
+                num_tiles=num_tiles[
+                    0
+                ],  # 单图，因此只选择第一个图像被划分出来的patch数量
             )
         )
         return model_inputs

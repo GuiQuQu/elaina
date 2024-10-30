@@ -19,7 +19,7 @@ class InternVL2Tester(DefaultTester):
         model_path,
         dataloader_config,
         generation_config,
-        metrics,
+        metrics = [],
         max_steps: int = -1,
         checkpoint_list: List[str] = [],
     ):

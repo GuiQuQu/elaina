@@ -13,11 +13,11 @@ from dataset.base_preprocessor import BasePreprocessor
 from dataset.docvqa.docvqa_utils import truncate_layout
 from logger import logger
 
-prompt_template = """You are given an image and a question. 
-Image: {image}
-Question: {question}
-If you can get the answer from the image, please input 'A', otherwise, please input 'B'.
-"""
+# prompt_template = """You are given an image and a question. 
+# Image: {image}
+# Question: {question}
+# If you can get the answer from the image, please input 'A', otherwise, please input 'B'.
+# """
 
 prompt_template_add_layout = """You are given an image,its corresponding string layout and a question.
 Image: {image}
@@ -77,7 +77,7 @@ class MPDocVQAClassifyOCRInternVL2Preprocessor(BasePreprocessor):
         )
 
     def get_prompt(self, label, **kwargs):
-        prompt = prompt_template.format(**kwargs)
+        prompt = prompt_template_add_layout.format(**kwargs)
         train_ret = [
             {"from": "human", "value": prompt},
             {"from": "gpt", "value": label},
@@ -112,7 +112,7 @@ class MPDocVQAClassifyOCRInternVL2Preprocessor(BasePreprocessor):
         return layout
 
     def preprocess(self, item):
-
+        
         qid = item["qid"]
         question = item["question"]
         image_path = item["image_path"]
