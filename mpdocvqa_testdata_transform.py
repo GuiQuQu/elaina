@@ -22,7 +22,7 @@ def read_testdata(json_path):
     return qid2item
 
 
-def generate_answer_jsonl(save_path,pred_data, testdataset):
+def generate_answer_json(save_path,pred_data, testdataset):
     """
     save_path:保存的路径
     pred_data:预测的结果
@@ -53,7 +53,7 @@ def generate_answer_jsonl(save_path,pred_data, testdataset):
 
 
 if __name__ == "__main__":
-    pred_data_path = "/root/elaina/testdataset_result/vqa_result/checkpoint-4000-result.json"
+    pred_data_path = "testdataset_result/MPDocVQA/vqa_ocr_result/checkpoint-4000-result.json"
     
     pred_data = read_input(pred_data_path)
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     qid2item = read_testdata(testdataset_path)
 
     save_path = pred_data_path.replace(".json", "_mpdocvqa_format.json")
-    generate_answer_jsonl(
+    generate_answer_json(
         save_path=save_path,
         pred_data=pred_data,
         testdataset=qid2item

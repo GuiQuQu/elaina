@@ -26,7 +26,7 @@
         "preprocess_config": {
             "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_test_preprocessor.MPDocVQAVQAInternVL2TestPreprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "classify_result_path": "testdataset_result/classify_result/checkpoint-40000-result.json",
+            "classify_result_path": "testdataset_result/MPDocVQA/classify_result/checkpoint-40000-result.json",
             "max_seq_length": 2048
         }
     },

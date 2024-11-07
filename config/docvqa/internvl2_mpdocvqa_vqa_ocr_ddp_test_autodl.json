@@ -24,11 +24,11 @@
     "test_dataset": {
         "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
         "dataset_path": "/root/autodl-tmp/MPDocVQA",
-        "split": "val",
+        "split": "test",
         "preprocess_config": {
             "type": "dataset.docvqa.mpdocvqa_vqa_ocr_internvl2_test_preprocessor.MPDocVQAVQAOCRInternVL2TestPreprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "classify_result_path": "outputs/MPDocVQA/classify_output/test_result/checkpoint-35000-result.json",
+            "classify_result_path": "testdataset_result/MPDocVQA/classify_result/checkpoint-40000-result.json",
             "max_seq_length": 2560,
             "max_layout_length": 640
         }
@@ -48,7 +48,7 @@
     "tester": {
         "type": "tester.internvl2_tester.InternVL2Tester",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "output_dir": "outputs/MPDocVQA/vqa_ocr_output/test_result",
+        "output_dir": "testdataset_result/MPDocVQA/vqa_ocr_result",
         "generation_config": {
             "max_new_tokens": 128,
             "do_sample": false

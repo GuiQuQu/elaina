@@ -50,7 +50,7 @@
         "dataloader_config": {
             "max_steps": -1,
             "batch_size" : 8,
-            "num_workers": 0,
+            "num_workers": 4,
             "shuffle": false
         },
         "metrics": [

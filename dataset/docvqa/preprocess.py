@@ -167,6 +167,9 @@ def preprocess_internlm_for_test(
         num_image: int = 1,
         system_message:str = "你是由上海人工智能实验室联合商汤科技开发的书生多模态大模型，英文名叫InternVL, 是一个有用无害的人工智能助手。",
 )->Dict:
+    """
+        默认left padding
+    """
     conv = get_conv_template(template_name)
     conv.set_system_message(system_message)
     roles = {'human': conv.roles[0], 'gpt': conv.roles[1]}

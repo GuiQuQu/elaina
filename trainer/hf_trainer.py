@@ -35,9 +35,9 @@ def build_hf_trainer(config):
     hfparser = HfArgumentParser(TrainingArguments)
     training_args = hfparser.parse_dict(build_training_args_dict(config),allow_extra_keys=True)[0]
     # Log on each process the small summary:
-    logger.warning(
-        f'Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}'
-        + f'distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}'
+    logger.info(
+        f'Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu},'
+        + f'distributed training: {bool(training_args.local_rank != -1)}, fp16 training: {training_args.fp16}, bf16 training: {training_args.bf16}'
     )
     logger.info(f'Training/evaluation parameters {training_args}')
     set_seed(training_args.seed)
@@ -45,8 +45,8 @@ def build_hf_trainer(config):
     # load dataset
     train_dataset_config = config.get('train_dataset', None)
     train_dataset = build_dataset(train_dataset_config,split='train')
-    eval_dataset_config = config.get('eval_dataset', None)
-    eval_dataset = build_dataset(eval_dataset_config,split='eval')
+    eval_dataset_config = config.get('val_dataset', None)
+    eval_dataset = build_dataset(eval_dataset_config,split='val')
     if train_dataset is None:
         raise ValueError('No training dataset provided.')
 
