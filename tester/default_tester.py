@@ -28,7 +28,7 @@ class DefaultTester:
         test_dataset,
         output_dir,
         dataloader_config,
-        metrics = [],
+        metrics=[],
         max_steps: int = -1,
         checkpoint_list: List[str] = [],
     ):
@@ -63,7 +63,13 @@ class DefaultTester:
                 save_path, save_path.replace("result.json", "metrics.json")
             )
 
-    def run_model(self, model, batch: dict) -> Tuple[float,List[Any]]:
+    def run_model(self, model, batch: dict) -> Tuple[float, List[Any]]:
+        """
+            return float, loss
+            List[Any], model output
+            allow type: 1. float, str, int, torch.Tensor, the will be saved directly
+                        2. dict, key-value pair will be extracted and saved
+        """
         model_input_batch, delete_batch = delete_not_used_key_from_batch(model, batch)
         outputs = model(**model_input_batch)
         batch.update(delete_batch)
@@ -87,16 +93,20 @@ class DefaultTester:
             json.dump(metrics_result, f, ensure_ascii=False, indent=2)
 
     def save_result(self, result, save_path):
-        with open(save_path, "w", encoding='utf-8') as f:
+        with open(save_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
     @torch.no_grad()
     def test_one_checkpoint(self, model) -> List[Dict[str, Any]]:
         result = []
-        for i, batch in enumerate(tqdm(self.dataloader,desc="Testing",total=self.max_steps)):
+        for i, batch in enumerate(
+            tqdm(self.dataloader, desc="Testing", total=self.max_steps)
+        ):
             if i >= self.max_steps:
                 break
-            _, output = self.run_model(model, batch)  # loss, score
+            _, output = self.run_model(
+                model, batch
+            )  # loss, score[torch.tensor, list, or list of dict]
             if isinstance(output, torch.Tensor):
                 output = output.detach().to(torch.float32).cpu().numpy().tolist()
             if isinstance(output, list):
@@ -110,13 +120,28 @@ class DefaultTester:
     ) -> List[Dict[str, Any]]:
 
         save_keys = getattr(self.test_dataset.preprocessor, "save_keys")
+        has_extra = 'extra' in batch
+        if len(save_keys) == 0 and not has_extra:
+            logger.warning(
+                f"save_keys = {save_keys} has_extra: {has_extra}, please check if you have set save_keys in preprocessor"
+            )
+        if has_extra and len(save_keys) > 0:
+            logger.warning(
+                f"save_keys = {save_keys} has_extra: {has_extra}, normally you should only set one of them"
+            )
         result = []
         batch_keys = list(batch.keys())
         for i, output in enumerate(model_outputs):
-            one_data = dict(model_output=output)
+            one_data = dict()
+            if isinstance(output, dict):
+                one_data.update(output)
+            else:
+                one_data["model_output"] = output
             for key in batch_keys:
                 if key in save_keys:
                     one_data[key] = batch[key][i]
+                if key == 'extra' and isinstance(batch[key][i], dict):
+                    one_data.update(batch[key][i])
             result.append(one_data)
         return result
 

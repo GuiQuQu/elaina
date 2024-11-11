@@ -15,6 +15,7 @@ from models.docvqa.internvl2.tokenization_internlm2 import (
 )
 
 from models.docvqa.internvl2.constant import IMG_CONTEXT_TOKEN
+from models.automatic_weighted_loss import AutomaticWeightedLoss
 
 from logger import logger
 
@@ -108,6 +109,7 @@ class InternVL2AllyModel(nn.Module):
                 2 * use_llm_lora,
             )
 
+        self.awl = AutomaticWeightedLoss(2)
         self.count_parameters()
 
     def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
@@ -193,10 +195,8 @@ class InternVL2AllyModel(nn.Module):
             vqa_label,
         )
         # 两个任务的loss权重
-        w1 = 0.5
-        w2 = 0.5
         if cls_loss and vqa_loss:
-            loss = w1 * cls_loss + w2 * vqa_loss
+            loss = self.awl(cls_loss, vqa_loss)
 
         return loss, cls_outputs
 

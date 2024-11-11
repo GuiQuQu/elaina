@@ -33,7 +33,7 @@
         }
     },
     "model": {
-        "type": "models.docvqa.internvl2_ally_model.InternVL2AllyModel",
+        "type": "models.docvqa.internvl2_ally_model_awl.InternVL2AllyModel",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
         "use_backbone_lora": 0,
         "use_llm_lora": 0,
@@ -42,11 +42,11 @@
         "frzzze_mlp": true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/ally_output",
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/ally_output_awl",
     "data_collator": "dataset.docvqa.collator.internvl2_concat_collator",
     "tester": {
         "type": "tester.ally_tester.InternVL2AllyTester",
-        "output_dir": "outputs/MPDocVQA/ally_output/test_result",
+        "output_dir": "outputs/MPDocVQA/ally_output_awl/test_result",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
         "generation_config": {
             "max_new_tokens": 128,

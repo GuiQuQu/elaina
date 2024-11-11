@@ -67,3 +67,7 @@ ddp需要注意的问题
 2. 把两个任务完全拆开，独立进行
 3. 两个任务的损失loss相加
 
+
+问题
+1. 在num_worker > 0时，在__getitem__设置dataset的属性可能有出问题,因此self.save_keys可能无法正常设置
+

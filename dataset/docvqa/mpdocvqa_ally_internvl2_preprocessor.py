@@ -171,7 +171,6 @@ class MPDocVQAAllyInternVL2Preprocessor(BasePreprocessor):
             system_message=self.system_message,
             num_image=1,
         )
-
         model_inputs = dict()
         extra = dict(
             qid=qid,
@@ -182,11 +181,12 @@ class MPDocVQAAllyInternVL2Preprocessor(BasePreprocessor):
             answers=answers,
             classify_label=cls_label,
         )
-        model_inputs.update(extra)
-        self.save_keys = list(extra.keys())
-
+        # model_inputs.update(extra)
+        # 在num_worker > 0 的情况下,这行代码可能会不起作用
+        # self.save_keys = list(extra.keys())
         model_inputs.update(
             dict(
+                extra = extra,
                 pixel_values=pixel_values,
                 test_pixel_values=test_pixel_values,
                 vqa_input_ids=vqa_train_inputs["input_ids"].squeeze(),
@@ -195,7 +195,9 @@ class MPDocVQAAllyInternVL2Preprocessor(BasePreprocessor):
                 classify_input_ids=classify_inputs["input_ids"].squeeze(),
                 classify_attention_mask=classify_inputs["attention_mask"].squeeze(),
                 cls_label=torch.tensor(cls_label, dtype=torch.long),
+                vqa_train_conversation=vqa_train_conversation,
                 vqa_label=vqa_train_inputs["labels"].squeeze(),
+                num_tiles=num_tiles[0],  # 单图，因此只选择第一个图像被划分出来的patch数量,for test
             )
         )
         return model_inputs

@@ -1,5 +1,12 @@
 {
     "seed" : 42,
     "data_collator": "dataset.default_collator.default_collate",
-    "output_dir":"./outputs/default"
+    "output_dir":"./outputs/default",
+    "registry_paths": [
+        "dataset",
+        "models",
+        "metrics",
+        "tester",
+        "trainer"
+    ]
 }
