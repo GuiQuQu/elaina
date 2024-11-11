@@ -2,9 +2,11 @@ import os
 from _collections_abc import dict_values
 import importlib.util
 
-class Register(dict):
-    def __init__(self, *args, **kwargs):
-        super(Register, self).__init__(*args, **kwargs)
+from logger import logger
+
+class __Register(dict):
+    def __init__(self):
+        super().__init__()
         self._dict = {}
 
     def __setitem__(self, key, value):
@@ -24,6 +26,9 @@ class Register(dict):
 
     def __call__(self, name=None):
         return self.registry(name)
+
+    def __repr__(self) -> str:
+        return self._dict.__repr__()
 
     def registry(self,name):
         
@@ -54,11 +59,15 @@ class Register(dict):
         return self._dict.items()
 
 
-register = Register()
+Register = __Register()
 
 
 def registry_pycls_by_path(path):
-
+    """
+        目前的逻辑是不管三七二十一,直接导入所有py文件
+        然后有相应注册逻辑类就会被注册，没有则不会
+        整体来说，还是有一定的优化空间的
+    """
     if not os.path.exists(path):
         return
     
@@ -70,10 +79,13 @@ def registry_pycls_by_path(path):
             if file != '__pycache__':
                 registry_pycls_by_path(os.path.join(path, file))
         return
-    
-    module_name = os.path.splitext(os.path.basename(path))[0]
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    try:
+        module_name = os.path.splitext(os.path.basename(path))[0]
+        spec = importlib.util.spec_from_file_location(module_name, path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    except ImportError as e:    # 当遇到导入错误,可能是因为内部有相对导入,无法在根目录下导入的情况,则忽略该文件
+        logger.debug(f"import path: {path}, ImportError: {e}")
+        return
 
 

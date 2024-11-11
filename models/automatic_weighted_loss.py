@@ -1,6 +1,9 @@
 import torch
 from torch import nn
 
+from utils.register import Register
+
+@Register(name='awl')
 class AutomaticWeightedLoss(nn.Module):
     """automatically weighted multi-task loss
     参考:
