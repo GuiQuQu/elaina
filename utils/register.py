@@ -34,20 +34,22 @@ class __Register(dict):
         
         def add_to_dict(key, cls):
             if key in self._dict:
-                print(f"Key {key} already exists")
+                logger.warning(f"Key '{key}' already exists in register, will override it.")
             self._dict[key] = cls
         
         cls = name
         if callable(cls): # 传入cls,无参使用,直接完成注册返回cls
             add_to_dict(cls.__name__, cls)
             return cls
-        else: # 传入name,有参使用,返回装饰器
+        elif isinstance(name, str): # 传入name,有参使用,返回装饰器
             def decorator(cls_or_fn):
                 key = name if name is not None else cls_or_fn.__name__
                 add_to_dict(key, cls_or_fn)
                 return cls_or_fn
-
             return decorator
+        else:
+            raise ValueError(f"name should be a string, but get '{name}', type is {type(name)}")
+            
 
     def keys(self):
         return self._dict.keys()
