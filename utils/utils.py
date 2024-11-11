@@ -4,10 +4,25 @@ import inspect
 
 import torch
 
+from utils.register import Register
 from logger import logger
 
 
-def get_cls_or_func(path_str: str):
+def get_cls_or_func(path_str_or_name: str):
+    """
+    Firstly, try find the name whether or not is register,
+    if yes, return the register cls or func
+    
+    Secondly, assume the path_str_or_name is a import moudule path, 
+    then import the module and return the cls or func
+    
+    """
+    if path_str_or_name in Register:
+        return Register[path_str_or_name]
+    else:
+        return import_and_get_cls_or_func(path_str_or_name)
+
+def import_and_get_cls_or_func(path_str: str):
     """
     import a class or function from a string path
     """
@@ -18,6 +33,7 @@ def get_cls_or_func(path_str: str):
     module = __import__(module_path, fromlist=[cls_name])
     cls = getattr(module, cls_name)
     return cls
+
 
 def load_default_config():
     with open('config/default_config.json', 'r') as f:

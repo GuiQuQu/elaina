@@ -67,7 +67,9 @@ def build_hf_trainer(config):
         data_collator=data_collator,
     )
 
+from utils.register import Register
 
+@Register(name='hf_trainer')
 class HFTrainer(BaseTrainer):
     def __init__(
         self,

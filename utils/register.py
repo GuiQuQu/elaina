@@ -1,12 +1,13 @@
 import os
 from _collections_abc import dict_values
 import importlib.util
+from pathlib import Path
 
 from logger import logger
 
 class __Register(dict):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._dict = {}
 
     def __setitem__(self, key, value):
@@ -33,8 +34,11 @@ class __Register(dict):
     def registry(self,name):
         
         def add_to_dict(key, cls):
-            if key in self._dict:
-                logger.warning(f"Key '{key}' already exists in register, will override it.")
+            if key in self._dict: 
+                # 如果key已经存在,则忽略
+                # 如果进行了覆盖，会导致这里得到的cls和绝对引用得到的cls不是同一个class
+                logger.warning(f"Key '{key}' already exists in register, will ignore it.")
+                return
             self._dict[key] = cls
         
         cls = name
@@ -79,10 +83,14 @@ def registry_pycls_by_path(path):
     if os.path.isdir(path):
         for file in os.listdir(path):
             if file != '__pycache__':
-                registry_pycls_by_path(os.path.join(path, file))
+                subdir_path = os.path.join(path, file)
+                registry_pycls_by_path(subdir_path)
         return
     try:
-        module_name = os.path.splitext(os.path.basename(path))[0]
+        # 需要按照绝对引用的module_name来导入对应的模块
+        cwd = Path(os.getcwd())
+        cur_path = Path(path).absolute()
+        module_name = cur_path.relative_to(cwd).with_suffix('').as_posix().replace('/', '.')
         spec = importlib.util.spec_from_file_location(module_name, path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
