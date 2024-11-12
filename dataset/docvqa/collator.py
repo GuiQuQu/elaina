@@ -1,5 +1,7 @@
 import torch
+from utils.register import Register
 
+@Register(name="internvl2_concat_collator")
 def internvl2_concat_collator(batch):
     assert isinstance(batch, list)
 

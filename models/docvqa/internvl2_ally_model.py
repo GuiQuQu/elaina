@@ -17,7 +17,7 @@ from models.docvqa.internvl2.tokenization_internlm2 import (
 from models.docvqa.internvl2.constant import IMG_CONTEXT_TOKEN
 
 from logger import logger
-
+from utils.register import Register
 
 def get_torch_dtype(model_dtype: str):
     if model_dtype == "bf16":
@@ -54,6 +54,7 @@ class MLP(nn.Module):
         return x
 
 
+@Register(name="internvl2_ally_model")
 class InternVL2AllyModel(nn.Module):
     def __init__(
         self,

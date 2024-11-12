@@ -12,6 +12,7 @@ from dataset.docvqa.preprocess import (
 )
 from dataset.base_preprocessor import BasePreprocessor
 from logger import logger
+from utils.register import Register
 
 prompt_template_for_classify = """You are given an image and a question. 
 Image: {image}
@@ -26,6 +27,7 @@ You should extract the answer from the text in the image without changing the or
 Answer: """
 
 
+@Register(name="mpdocvqa_ally_internvl2_preprocessor")
 class MPDocVQAAllyInternVL2Preprocessor(BasePreprocessor):
     def __init__(
         self,

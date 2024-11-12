@@ -5,13 +5,13 @@ from typing import List, Tuple, Any
 from tester.default_tester import DefaultTester
 
 from models.docvqa.internvl2.tokenization_internlm2 import InternLM2Tokenizer
-
+from utils.register import Register
 
 def open_json(json_path):
     with open(json_path, "r") as f:
         return json.load(f)
 
-
+@Register(name="internvl2_ally_tester")
 class InternVL2AllyTester(DefaultTester):
     def __init__(
         self,

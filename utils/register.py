@@ -25,7 +25,7 @@ class __Register(dict):
     def __str__(self) -> str:
         return str(self._dict)
 
-    def __call__(self, name=None):
+    def __call__(self, name):
         return self.registry(name)
 
     def __repr__(self) -> str:

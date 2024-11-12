@@ -1,10 +1,11 @@
 import os
 
 from tester.default_tester import DefaultTester
+from utils.register import Register
 
 TRARGET_FILE_NAMES = ["pytorch_model.bin", "model.safetensors"]
 
-
+@Register(name="hf_tester")
 class HFTester(DefaultTester):
     def __init__(
         self,

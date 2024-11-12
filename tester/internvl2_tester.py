@@ -4,11 +4,15 @@ import json
 from tester.default_tester import DefaultTester
 
 from models.docvqa.internvl2.tokenization_internlm2 import InternLM2Tokenizer
+from utils.register import Register
+
 
 def open_json(json_path):
     with open(json_path, "r") as f:
         return json.load(f)
 
+
+@Register(name="internvl2_tester")
 class InternVL2Tester(DefaultTester):
     def __init__(
         self,
@@ -19,7 +23,7 @@ class InternVL2Tester(DefaultTester):
         model_path,
         dataloader_config,
         generation_config,
-        metrics = [],
+        metrics=[],
         max_steps: int = -1,
         checkpoint_list: List[str] = [],
     ):
@@ -47,6 +51,6 @@ class InternVL2Tester(DefaultTester):
             pixel_values=test_pixel_values,
             questions=questions,
             generation_config=self.generation_config,
-            num_patches_list = batch['num_tiles'],
+            num_patches_list=batch["num_tiles"],
         )
-        return None,reponses
+        return None, reponses

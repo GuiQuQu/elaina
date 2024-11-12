@@ -2,7 +2,7 @@ import os
 import json
 
 from dataset.base_dataset import BaseDataset, prepare_data_and_preprocessor
-
+from utils.register import Register
 
 def open_data(json_path):
     with open(json_path, "r", encoding="utf-8") as f:
@@ -11,6 +11,7 @@ def open_data(json_path):
 
 
 @prepare_data_and_preprocessor
+@Register(name="mpdocvqa_classify_dataset")
 class MPDocVQAClassifyDataset(BaseDataset):
     def __init__(self, preprocess_config, dataset_path: str, split:str="train" ) -> None:
         super().__init__(preprocess_config)

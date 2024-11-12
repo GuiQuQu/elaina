@@ -11,6 +11,7 @@ from dataset.docvqa.preprocess import (
 from dataset.docvqa.ocr2layout.mp_ocr2layout import transform_ocr2layout
 from dataset.base_preprocessor import BasePreprocessor
 from dataset.docvqa.docvqa_utils import truncate_layout
+from utils.register import Register
 from logger import logger
 
 # prompt_template = """You are given an image and a question. 
@@ -27,7 +28,7 @@ Question: {question}
 If you can get the answer from the image or layout, please input 'A', otherwise, please input 'B'.
 """
 
-
+@Register(name="mpdocvqa_classify_ocr_internvl2_preprocessor")
 class MPDocVQAClassifyOCRInternVL2Preprocessor(BasePreprocessor):
     def __init__(
         self,

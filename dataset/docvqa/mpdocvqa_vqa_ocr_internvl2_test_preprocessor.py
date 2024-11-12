@@ -18,6 +18,7 @@ from dataset.docvqa.docvqa_utils import truncate_layout
 from dataset.docvqa.ocr2layout.mp_ocr2layout import transform_ocr2layout
 from dataset.base_preprocessor import BasePreprocessor
 from logger import logger
+from utils.register import Register
 
 # prompt_template = """You are given an image and a question. 
 # Image: {image}
@@ -35,7 +36,7 @@ Please answer the question based on the image and its its corresponding string l
 You should extract the answer from the text in the image without changing the order and form of the words.
 Answer:"""
 
-
+@Register(name="mpdocvqa_vqa_ocr_internvl2_test_preprocessor")
 class MPDocVQAVQAOCRInternVL2TestPreprocessor(BasePreprocessor):
     def __init__(
         self,

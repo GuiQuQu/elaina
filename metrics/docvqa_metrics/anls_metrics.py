@@ -3,8 +3,10 @@ import Levenshtein
 import json
 
 from metrics.base_metrics import BaseMetrics
+from utils.register import Register
 from logger import logger
 
+@Register(name="anls")
 class ANLSMetrics(BaseMetrics):
     def __init__(
         self, result_path, pred_replace_star: bool = False, pred_replace_n: bool = False,

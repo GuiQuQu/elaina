@@ -2,6 +2,7 @@ from typing import Tuple
 import pandas as pd
 
 from metrics.base_metrics import BaseMetrics
+from utils.register import Register
 from logger import logger
 
 # 计算所有的正负样本对中，正样本排在负样本前面的概率
@@ -39,6 +40,7 @@ def calc_auc(y_true, y_pred):
 
 # from sklearn.metrics import roc_auc_score
 
+@Register(name="auc")
 class AUCMetrics(BaseMetrics):
     def __init__(self, result_path, pred_key="model_output", label_key="label"):
         super().__init__(result_path)

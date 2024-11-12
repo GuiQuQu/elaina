@@ -3,8 +3,9 @@ from typing import Tuple
 import json
 
 from metrics.docvqa_metrics.anls_metrics import ANLSMetrics
+from utils.register import Register
 
-
+@Register(name="mp_anls")
 class MPDocVQAANLSMetrics(ANLSMetrics):
     def __init__(
         self,

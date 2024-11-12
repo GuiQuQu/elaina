@@ -17,10 +17,12 @@ from utils.utils import (
     delete_not_used_key_from_batch,
 )
 from utils.dist_variable import DistVarible
+from utils.register import Register
 from dataset.default_collator import default_collate
 from logger import logger
 
 
+@Register(name="default_tester")
 class DefaultTester:
     def __init__(
         self,

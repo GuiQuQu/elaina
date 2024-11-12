@@ -18,7 +18,7 @@ from models.docvqa.internvl2.tokenization_internlm2 import (
 from models.docvqa.internvl2.constant import IMG_CONTEXT_TOKEN
 
 from logger import logger
-
+from utils.register import Register
 
 def get_torch_dtype(model_dtype: str):
     if model_dtype == "bf16":
@@ -57,6 +57,7 @@ def _freeze_params(module):
 
 # lora 的优先级比freeze的优先级高
 # 就算freeze了，但是lora的设置依然是有效的
+@Register(name="internvl2_classify_model")
 class InternVL2ClassifyModel(nn.Module):
     def __init__(
         self,

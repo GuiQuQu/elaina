@@ -1,11 +1,12 @@
 
 import torch
-
+from utils.register import Register
 # elem type: list of int,float,str
 # elem type: list of torch.Tensor
 # elem type: list of [[1,2,3],[4,5,6],[7,8,9]]  => 
 # elem type: list of dict
 
+@Register(name="default_collate")
 def default_collate(batch):
     """
         batch : list of dict

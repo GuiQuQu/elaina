@@ -14,6 +14,7 @@ from dataset.docvqa.preprocess import (
 )
 from dataset.base_preprocessor import BasePreprocessor
 from logger import logger
+from utils.register import Register
 
 prompt_template = """You are given an image and a question. 
 Image: {image}
@@ -45,6 +46,7 @@ def internvl2_concat_collator(batch):
     return ret_batch
 
 
+@Register(name="mpdocvqa_vqa_internvl2_preprocessor")
 class MPDocVQAVQAInternVL2Preprocessor(BasePreprocessor):
     def __init__(
         self,

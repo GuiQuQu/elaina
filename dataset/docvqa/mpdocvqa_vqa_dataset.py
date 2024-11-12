@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 
 
 from dataset.base_dataset import BaseDataset, prepare_data_and_preprocessor
-
+from utils.register import Register
 
 def open_data(json_path):
     with open(json_path, "r", encoding="utf-8") as f:
@@ -14,6 +14,7 @@ def open_data(json_path):
 
 
 @prepare_data_and_preprocessor
+@Register(name="mpdocvqa_vqa_dataset")
 class MPDocVQAVqaDataset(BaseDataset):
     def __init__(
         self,
