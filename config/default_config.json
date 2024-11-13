@@ -8,5 +8,6 @@
         "metrics",
         "tester",
         "trainer"
-    ]
+    ],
+    "logger_level": "INFO"
 }

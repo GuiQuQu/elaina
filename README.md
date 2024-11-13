@@ -71,3 +71,9 @@ ddp需要注意的问题
 问题
 1. 在num_worker > 0时，在__getitem__设置dataset的属性可能有出问题,因此self.save_keys可能无法正常设置
 
+
+
+# 11.12 目前不支持的功能
+1. 传入logger_level信息，修改对应的logger_level，目前只能用info
+2. 多卡情况下没有测试过logger的输出情况，是否存在相同的内容多次输出的情况
+

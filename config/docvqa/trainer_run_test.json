@@ -1,36 +1,36 @@
 {
     "train_dataset": {
-        "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
+        "type": "mpdocvqa_classify_dataset",
         "dataset_path": "/home/klwang/data/MPDocVQA",
         "split": "train",
         "preprocess_config": {
-            "type": "dataset.docvqa.internvl2_preprocessor.InternVL2Preprocessor",
+            "type": "mpdocvqa_vqa_internvl2_preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
             "max_seq_length": 2048
         }
     },
     "val_dataset": {
-        "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
+        "type": "mpdocvqa_classify_dataset",
         "dataset_path": "/home/klwang/data/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "dataset.docvqa.internvl2_preprocessor.InternVL2Preprocessor",
+            "type": "mpdocvqa_vqa_internvl2_preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
             "max_seq_length": 2048
         }
     },
     "test_dataset": {
-        "type": "dataset.docvqa.mpdocvqa_classify_dataset.MPDocVQAClassifyDataset",
+        "type": "mpdocvqa_classify_dataset",
         "dataset_path": "/home/klwang/data/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "dataset.docvqa.internvl2_preprocessor.InternVL2Preprocessor",
+            "type": "mpdocvqa_vqa_internvl2_preprocessor",
             "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
             "max_seq_length": 2048
         }
     },
     "model": {
-        "type": "models.docvqa.classify_model.InternVL2ClassifyModel",
+        "type": "intenvl2_classify_model",
         "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
         "use_backbone_lora":0,
         "use_llm_lora":0,
@@ -40,19 +40,19 @@
         "model_dtype": "bf16"
     },
     "output_dir": "./outputs/MPDocVQA/trainer_test_output",
-    "data_collator": "dataset.docvqa.internvl2_preprocessor.internvl2_concat_collator",
+    "data_collator": "internvl2_concat_collator",
     "seed": 42,
     "tester": {
-        "type": "tester.hf_tester.HFTester",
-        "hf_checkpoint_dir": "./outputs/MPDocVQA/classify_output",
+        "type": "hf_tester",
+        "hf_checkpoint_dir": "./outputs/MPDocVQA/test_output",
         "dataloader_config": {
             "max_steps": 5,
             "batch_size" : 2,
-            "num_workers": 0,
+            "num_workers": 4,
             "shuffle": false
         }
     },
-    "trainer": "trainer.hf_trainer.HFTrainer",
+    "trainer": "hf_trainer",
     "training_args": {
         "do_train": true,
         "do_eval": false,
@@ -66,7 +66,7 @@
         "per_device_train_batch_size": 2,
         "dataloader_pin_memory": true,
         "dataloader_prefetch_factor ": 2,
-        "dataloader_num_workers": 0,
+        "dataloader_num_workers": 2,
         "gradient_accumulation_steps": 4,
         "optim": "adamw_torch",
         "learning_rate": 4e-5,

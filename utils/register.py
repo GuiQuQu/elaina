@@ -37,7 +37,7 @@ class __Register(dict):
             if key in self._dict: 
                 # 如果key已经存在,则忽略
                 # 如果进行了覆盖，会导致这里得到的cls和绝对引用得到的cls不是同一个class
-                logger.warning(f"Key '{key}' already exists in register, will ignore it.")
+                logger.debug(f"Key '{key}' already exists in register, will ignore it.")
                 return
             self._dict[key] = cls
         

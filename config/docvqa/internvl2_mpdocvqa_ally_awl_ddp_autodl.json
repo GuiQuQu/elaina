@@ -53,8 +53,11 @@
             "do_sample": false
         },
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_output/checkpoint-40000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_output/checkpoint-30000/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/ally_output_awl/checkpoint-10000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/ally_output_awl/checkpoint-20000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/ally_output_awl/checkpoint-30000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/ally_output_awl/checkpoint-40000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/ally_output_awl/checkpoint-41184/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
@@ -64,7 +67,7 @@
         },
         "metrics": [
             {
-                "type": "metrics.auc_metrics.AUCMetrics",
+                "type": "auc",
                 "pred_key": "score",
                 "label_key": "classify_label"
             },

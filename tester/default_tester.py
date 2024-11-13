@@ -83,13 +83,18 @@ class DefaultTester:
         }
         for m in self.metrics_config:
             metrics = build_metrics(m, result_path=result_path)
-            metrics_type = m.get("type", None)
+            # metrics_type = m.get("type", None)
+            metrics_modules = metrics.__class__.__module__.split(".")
+            metrics_modules.append(metrics.__class__.__name__)
+            metrics_name = ".".join(metrics_modules)
             metrics_value, metrics_details = metrics.compute_metrics()
             logger.info(
-                f"{result_path}=> {metrics_type}: {metrics_value}, metrics_details: {metrics_details}"
+                f"{result_path}=> {metrics_name}: {metrics_value}, metrics_details: {metrics_details}"
             )
-            metrics_result[metrics_type] = metrics_value
-            metrics_result[f"{metrics_type}_details"] = metrics_details
+            m
+            
+            metrics_result[metrics_name] = metrics_value
+            metrics_result[f"{metrics_name}_details"] = metrics_details
 
         with open(save_path, "w") as f:
             json.dump(metrics_result, f, ensure_ascii=False, indent=2)

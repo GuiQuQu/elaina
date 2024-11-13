@@ -5,6 +5,14 @@ import colorlog
 has_init_logger = False
 logger = None
 
+logger_levels = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
 def init_colorful_logger():
     global logger
     handler = logging.StreamHandler()
@@ -45,6 +53,7 @@ def init_logger():
 
 if not has_init_logger:
     # init_logger()
+    
     init_colorful_logger()
     init_transformer_logger()
     has_init_logger = True
