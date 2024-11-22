@@ -126,7 +126,7 @@ class DefaultTester:
         self, model_outputs: list, batch: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
 
-        save_keys = getattr(self.test_dataset.preprocessor, "save_keys")
+        save_keys = getattr(self.test_dataset.preprocessor, "save_keys",[])
         has_extra = 'extra' in batch
         if len(save_keys) == 0 and not has_extra:
             logger.warning(

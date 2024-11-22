@@ -37,7 +37,11 @@ def qwen2vl_concat_collator(batch):
             shape = elem[k].shape
             if all([d[k].shape == shape for d in batch]) and k not in [
                 "pixel_values",
+                "classify_pixel_values",
+                "vqa_pixel_values",
                 "test_pixel_values",
+                "test_vqa_pixel_values",
+                "test_classify_pixel_values",
             ]:
                 ret_batch[k] = torch.stack([d[k] for d in batch], dim=0)
             else:
