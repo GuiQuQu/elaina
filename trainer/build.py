@@ -11,7 +11,6 @@ def build_trainer(config):
     cls = get_cls_or_func(trainer_type)
     # if cls == HFTrainer:
     #     return build_hf_trainer(config)
-    breakpoint()
     if issubclass(cls,HFTrainer):
         return build_hf_trainer(config)
     else:

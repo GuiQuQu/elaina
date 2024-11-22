@@ -179,7 +179,11 @@ def transform_ocr2layout(ocr_path, placeholder=" "):
     # 删除左右两侧的空格
     min_left_space = min([len(line) - len(line.lstrip()) for line in line_str_list])
     min_right_space = min([len(line) - len(line.rstrip()) for line in line_str_list])
-    line_str_list = [line[min_left_space:-min_right_space] for line in line_str_list]
+    
+    if min_right_space > 0:
+        line_str_list = [line[min_left_space:-min_right_space] for line in line_str_list]
+    else:
+        line_str_list = [line[min_left_space:] for line in line_str_list]
     document_str = "\n".join(line_str_list)
     return document_str
 

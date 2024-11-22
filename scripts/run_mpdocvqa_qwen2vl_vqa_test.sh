@@ -1,0 +1,1 @@
+bash run_main.sh --config_file config/docvqa/qwen2vl_mpdocvqa_vqa_ddp_autodl.json --do_test
