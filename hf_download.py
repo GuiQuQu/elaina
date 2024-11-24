@@ -13,4 +13,4 @@ def download_model(repo_id, local_dir, **kwargs):
     )
 
 if __name__ == "__main__":
-    download_model(repo_id="Qwen/Qwen2-VL-2B-Instruct", local_dir="/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct")
+    download_model(repo_id="timm/eva02_large_patch14_clip_224.merged2b_s4b_b131k", local_dir="/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k")

@@ -104,7 +104,7 @@
         "evaluation_strategy": "no",
         "save_strategy": "steps",
         "save_steps": 10000,
-        "save_safetensors": true,
+        "save_safetensors": false,
         "save_total_limit": 5,
         "logging_strategy": "steps",
         "logging_steps": 10,
