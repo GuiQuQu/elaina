@@ -1,7 +1,11 @@
 import os
-import torch
+import functools
+from contextlib import contextmanager
 
+import torch
 import torch.distributed as dist
+
+
 
 class _DistVarible:
     rank = 0
@@ -46,3 +50,35 @@ class _DistVarible:
         return self.master_port
     
 DistVarible = _DistVarible()
+
+
+def rank0_only(func):
+    
+    @functools.wraps(func)
+    def warpper(*args, **kwargs):
+        if DistVarible.is_main_process:
+            return func(*args, **kwargs)
+        else:
+            return None
+    
+    return warpper
+
+@contextmanager
+def rank0_context():
+    if DistVarible.is_main_process:
+        try: # exec context code
+            yield
+        finally:
+            pass
+    else: # do nothing
+        yield from ()
+
+@contextmanager
+def rankn_context(n):
+    if DistVarible.rank == n:
+        try:
+            yield
+        finally:
+            pass
+    else:
+        yield from ()

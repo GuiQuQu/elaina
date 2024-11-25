@@ -18,4 +18,4 @@ sentencepiece
 ninja
 flash-attn
 python-Levenshtein
-open_clip
+open_clip_torch

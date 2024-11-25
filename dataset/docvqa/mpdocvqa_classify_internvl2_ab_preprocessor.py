@@ -16,7 +16,7 @@ prompt_template = """You are given an image and a question.
 Image: {image}
 Question: {question}
 if you can get the answer from the image, please input 'A', otherwise, please input 'B'.
-Answer:"""
+"""
 
 
 def concat_collator(batch):
@@ -191,7 +191,6 @@ class MPDocVQAClassifyInternVL2Preprocessor(BasePreprocessor):
                 test_pixel_values=test_pixel_values,
                 input_ids=train_inputs["input_ids"].squeeze(),
                 attention_mask=train_inputs["attention_mask"].squeeze(),
-                labels = train_inputs["labels"].squeeze(),
                 image_flags=torch.tensor([1] * pixel_values.size(0), dtype=torch.long),
                 cls_label=torch.tensor(cls_label, dtype=torch.long),
                 test_input_ids=test_inputs["input_ids"].squeeze(),
