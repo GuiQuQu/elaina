@@ -60,8 +60,8 @@ def internvl2_concat_collator(batch):
             ret_batch[k] = [d[k] for d in batch]
     return ret_batch
 
-@Register(name="mpdocvqa_classify_internvl2_preprocessor")
-class MPDocVQAClassifyInternVL2Preprocessor(BasePreprocessor):
+@Register(name="mpdocvqa_classify_ab_internvl2_preprocessor")
+class MPDocVQAClassifyABInternVL2Preprocessor(BasePreprocessor):
     def __init__(
         self,
         model_path,

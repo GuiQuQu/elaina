@@ -100,8 +100,8 @@ class InternVLChatModel(PreTrainedModel):
     ) -> Union[Tuple, CausalLMOutputWithPast]:
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
         image_flags = image_flags.squeeze(-1)
-        input_embeds = self.language_model.get_input_embeddings()(input_ids)
-
+        # input_embeds = self.language_model.get_input_embeddings()(input_ids)
+        input_embeds = self.language_model.get_input_embeddings()(input_ids).clone()
         vit_embeds = self.extract_feature(pixel_values)
         vit_embeds = vit_embeds[image_flags == 1]
         vit_batch_size = pixel_values.shape[0]

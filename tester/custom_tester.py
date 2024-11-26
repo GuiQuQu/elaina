@@ -36,6 +36,7 @@ class CustomTester(DefaultTester):
         # 需要在配置文件中填写的内容
         output_dir,
         dataloader_config,
+        test_raw_model: bool = False,
         metrics=[],
         checkpoint_list: List[str] = [],
     ):
@@ -44,6 +45,7 @@ class CustomTester(DefaultTester):
             test_dataset=test_dataset,
             output_dir=output_dir,
             dataloader_config=dataloader_config,
+            test_raw_model=test_raw_model,
             metrics=metrics,
             max_steps=-1,
             checkpoint_list=checkpoint_list,

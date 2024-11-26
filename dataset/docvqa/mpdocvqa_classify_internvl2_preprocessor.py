@@ -181,7 +181,7 @@ class MPDocVQAClassifyInternVL2Preprocessor(BasePreprocessor):
             label=cls_label,
             test_conversation=test_conversation,
         )
-        model_inputs.update(extra)
+        # model_inputs.update(extra)
         # self.save_keys = list(extra.keys())
 
         model_inputs.update(
@@ -196,6 +196,7 @@ class MPDocVQAClassifyInternVL2Preprocessor(BasePreprocessor):
                 cls_label=torch.tensor(cls_label, dtype=torch.long),
                 test_input_ids=test_inputs["input_ids"].squeeze(),
                 test_attention_mask=test_inputs["attention_mask"].squeeze(),
+                test_conversation=test_conversation,
             )
         )
         return model_inputs

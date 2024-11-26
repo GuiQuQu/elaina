@@ -30,6 +30,7 @@ class DefaultTester:
         test_dataset,
         output_dir,
         dataloader_config,
+        test_raw_model: bool = False,
         metrics=[],
         max_steps: int = -1,
         checkpoint_list: List[str] = [],
@@ -44,6 +45,9 @@ class DefaultTester:
 
         self._create_dataloader(dataloader_config)
         self.checkpoint_list = checkpoint_list
+        self.checkpoint_0_path = "/checkpoint-0/pytorch_model.bin"
+        if test_raw_model:
+            self.checkpoint_list.insert(0, self.checkpoint_0_path)
 
     def test(self):
         for checkpoint_path in self.checkpoint_list:
@@ -174,16 +178,22 @@ class DefaultTester:
     def load_checkpoint(self, checkpoint_path, state_dict_map_location="cpu"):
         gc.collect()
         torch.cuda.empty_cache()
+        
         model = load_model(self.model_config)
-        state_dict = load_state_dict_from_ckpt(checkpoint_path, state_dict_map_location)
-        check_model_state_dict_load(model, state_dict)
-        model.load_state_dict(state_dict, strict=True)
-        del state_dict
-        gc.collect()
-        torch.cuda.empty_cache()
-        logger.info(
-            f"[Model load] Model checkpoint loaded successfully from {checkpoint_path}."
-        )
+        if checkpoint_path != self.checkpoint_0_path:
+            state_dict = load_state_dict_from_ckpt(checkpoint_path, state_dict_map_location)
+            check_model_state_dict_load(model, state_dict)
+            model.load_state_dict(state_dict, strict=True)
+            del state_dict
+            gc.collect()
+            torch.cuda.empty_cache()
+            logger.info(
+                f"[Model load] Model checkpoint loaded successfully from {checkpoint_path}."
+            )
+        else:
+            logger.info(
+                f"[Model load], load model without checkpoint, only load model config"
+            )
         model.eval()
         model.requires_grad_(False)
         return model

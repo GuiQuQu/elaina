@@ -32,8 +32,8 @@ Please answer the question based on the image and its its corresponding string l
 You should extract the answer from the text in the image without changing the order and form of the words.
 Answer:"""
 
-@Register(name="mpdocvqa_vqa_qwen2vl_preprocessor")
-class MPDocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
+@Register(name="docvqa_vqa_qwen2vl_preprocessor")
+class DocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
     def __init__(
         self,
         model_path,

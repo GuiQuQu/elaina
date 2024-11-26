@@ -157,16 +157,18 @@ class DocVQAVqaInternVL2Preprocessor(BasePreprocessor):
             # train_conversation=train_conversation,
             test_conversation=test_conversation,
         )
-        model_inputs.update(extra)
-        self.save_keys = list(extra.keys())
+        # model_inputs.update(extra)
+        # self.save_keys = list(extra.keys())
         model_inputs.update(
             dict(
+                extra = extra,
                 pixel_values=pixel_values,
                 input_ids=train_inputs["input_ids"].squeeze(),
                 attention_mask=train_inputs["attention_mask"].squeeze(),
                 labels=train_inputs["labels"].squeeze(),
                 image_flags=torch.tensor([1] * pixel_values.size(0), dtype=torch.long),
                 test_pixel_values=test_pixel_values,
+                test_conversation=test_conversation,
                 num_tiles=num_tiles[0], # 单图，因此只选择第一个图像被划分出来的patch数量(batch_chat函数使用)
             )
         )
