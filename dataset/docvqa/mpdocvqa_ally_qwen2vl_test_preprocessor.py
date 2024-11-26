@@ -163,15 +163,6 @@ class MPDocVQAAllyQwen2VLPreprocessor(BasePreprocessor):
             image_grid_thw=vqa_train_inputs["image_grid_thw"],
         )
 
-        vqa_test_inputs = self.processor(
-            text = [vqa_test_text],
-            images = [image],
-            videos=None,
-            padding="max_length",
-            max_length = self.max_seq_length,
-            return_tensors="pt",
-        )
-
         # return
         model_inputs = dict()
         extra = dict(
@@ -200,17 +191,6 @@ class MPDocVQAAllyQwen2VLPreprocessor(BasePreprocessor):
                 vqa_input_ids=vqa_train_inputs["input_ids"].squeeze(),
                 vqa_attention_mask=vqa_train_inputs["attention_mask"].squeeze(),
                 vqa_label=vqa_labels.squeeze(),
-                # test classify
-                test_classify_pixel_values=classify_inputs["pixel_values"],
-                test_classify_image_grid_thw=classify_inputs["image_grid_thw"].squeeze(),
-                test_classify_input_ids=classify_inputs["input_ids"].squeeze(),
-                test_classify_attention_mask=classify_inputs["attention_mask"].squeeze(),
-
-                # test vqa
-                test_vqa_pixel_values=vqa_test_inputs["pixel_values"],
-                test_vqa_image_grid_thw=vqa_test_inputs["image_grid_thw"].squeeze(),
-                test_vqa_input_ids=vqa_test_inputs["input_ids"].squeeze(),
-                test_vqa_attention_mask=vqa_test_inputs["attention_mask"].squeeze(),
             )
         )
         return model_inputs

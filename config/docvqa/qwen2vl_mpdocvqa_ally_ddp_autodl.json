@@ -44,13 +44,12 @@
     "tester": {
         "type": "custom_tester",
         "output_dir": "outputs/MPDocVQA/qwen2vl_ally_output/test_result",
-        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_v2_output/checkpoint-40000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_v2_output/checkpoint-30000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_v2_output/checkpoint-20000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_v2_output/checkpoint-10000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/ally_v2_output/checkpoint-41184/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-40000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-30000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-20000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-10000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-41184/pytorch_model.bin"
         ],
         "dataloader_config": {
             "max_steps": -1,

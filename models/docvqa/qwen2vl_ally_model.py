@@ -295,7 +295,7 @@ class Qwen2VLAllyModel(nn.Module):
         for cls_score, vqa_text in zip(classify_ouputs, vqa_outputs):
             result.append({'score': cls_score, 'resp': vqa_text})
 
-        return result
+        return None,result
 
     def batch_chat(
         self,
