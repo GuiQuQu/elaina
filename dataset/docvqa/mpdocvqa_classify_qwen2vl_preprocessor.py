@@ -20,12 +20,12 @@ Image: {image}
 Question: {question}
 if you can get the answer from the image, please input 'A', otherwise, please input 'B'."""
 
-prompt_template_for_vqa = """You are given an image and a question. 
-Image: {image}
-Question: {question}
-Please answer the question based on the image.
-You should extract the answer from the text in the image without changing the order and form of the words.
-Answer: """
+# prompt_template_for_vqa = """You are given an image and a question. 
+# Image: {image}
+# Question: {question}
+# Please answer the question based on the image.
+# You should extract the answer from the text in the image without changing the order and form of the words.
+# Answer: """
 
 
 @Register(name="mpdocvqa_classify_qwen2vl_preprocessor")

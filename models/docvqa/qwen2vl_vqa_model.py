@@ -51,7 +51,7 @@ class Qwen2VLVQAModel(nn.Module):
                 attn_implementation="flash_attention_2",
             )
         )
-        breakpoint()
+        
         self.tokenizer: Qwen2Tokenizer = Qwen2Tokenizer.from_pretrained(model_path)
         self.tokenizer.padding_side = "left"
 
