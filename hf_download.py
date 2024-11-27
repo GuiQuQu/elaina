@@ -1,9 +1,11 @@
 import os
 
-os.environ['HF_ENDPOINT'] = "https://hf-mirror.com"
+os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+
 
 def download_model(repo_id, local_dir, **kwargs):
     from huggingface_hub import snapshot_download
+
     snapshot_download(
         repo_id=repo_id,
         local_dir=local_dir,
@@ -12,5 +14,9 @@ def download_model(repo_id, local_dir, **kwargs):
         **kwargs,
     )
 
+
 if __name__ == "__main__":
-    download_model(repo_id="timm/eva02_large_patch14_clip_224.merged2b_s4b_b131k", local_dir="/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k")
+    download_model(
+        repo_id="OpenGVLab/InternVL2-2B",
+        local_dir="/root/autodl-tmp/pretrain-model/InternVL2-2B",
+    )

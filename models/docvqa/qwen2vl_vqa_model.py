@@ -8,6 +8,13 @@ from transformers import (
     GenerationConfig,
 )
 
+from peft import LoraConfig, get_peft_model
+
+from models.docvqa.qwen2vl.qwen2vl_lora import (
+    find_all_linear_modules,
+    patch_target_modules,
+)
+
 from utils.register import Register
 
 from logger import logger
@@ -34,6 +41,7 @@ class Qwen2VLVQAModel(nn.Module):
     def __init__(
         self,
         model_path,
+        warp_qwen2vl_lora: int = 0,
         freeze_vision_model=True,
         freeze_llm_model=False,
         model_dtype="bf16",
@@ -62,6 +70,13 @@ class Qwen2VLVQAModel(nn.Module):
             self.model.model = self.model.model.eval()
             _freeze_params(self.model.model)
 
+        if warp_qwen2vl_lora:
+            self.warp_qwen2vl_lora(
+                r=warp_qwen2vl_lora, lora_alpha=2 * warp_qwen2vl_lora
+            )
+        
+        self.count_parameters()
+
     def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
         self.model.model.gradient_checkpointing_enable(gradient_checkpointing_kwargs)
 
@@ -81,7 +96,7 @@ class Qwen2VLVQAModel(nn.Module):
         image_grid_thw,
         labels=None,
     ):
-        
+
         device = self.model.device
         dtype = self.model.dtype
         loss = None
@@ -153,3 +168,24 @@ class Qwen2VLVQAModel(nn.Module):
             clean_up_tokenization_spaces=False,
         )
         return output_text
+
+    def warp_qwen2vl_lora(
+        self, r, lora_alpha, freeze_vision_tower=True, lora_dropout=0.05
+    ):
+        target_modules = find_all_linear_modules(
+            self.model, freeze_vision_tower=freeze_vision_tower
+        )
+        target_modules = patch_target_modules(
+            self.model.config,
+            freeze_vision_tower=freeze_vision_tower,
+            target_modules=target_modules,
+        )
+        lora_config = LoraConfig(
+            r=r,
+            target_modules=target_modules,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
+            task_type="CAUSAL_LM",
+        )
+        self.model = get_peft_model(self.model, lora_config)
+        self.model.enable_input_require_grads()
