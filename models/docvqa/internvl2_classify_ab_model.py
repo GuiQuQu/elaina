@@ -20,6 +20,7 @@ from models.docvqa.internvl2.constant import IMG_CONTEXT_TOKEN
 from logger import logger
 from utils.register import Register
 
+
 def get_torch_dtype(model_dtype: str):
     if model_dtype == "bf16":
         return torch.bfloat16
@@ -38,14 +39,14 @@ def _freeze_params(module):
 
 # lora 的优先级比freeze的优先级高
 # 就算freeze了，但是lora的设置依然是有效的
-@Register(name="internvl2_classify__ab_model")
+@Register(name="internvl2_classify_ab_model")
 class InternVL2ClassifyABModel(nn.Module):
     def __init__(
         self,
         model_path,
-        a_token = 'A',
-        b_token = 'B',
-        token_position = -1,
+        a_token="A",
+        b_token="B",
+        token_position=-1,
         use_backbone_lora=0,
         use_llm_lora=0,
         freeze_vision_model=True,
@@ -133,9 +134,7 @@ class InternVL2ClassifyABModel(nn.Module):
         """
         loss = None
 
-        pixel_values = pixel_values.to(
-            dtype=self.model.dtype, device=self.model.device
-        )
+        pixel_values = pixel_values.to(dtype=self.model.dtype, device=self.model.device)
         input_ids = input_ids.to(device=self.model.device)
         attention_mask = attention_mask.to(device=self.model.device)
         image_flags = image_flags.to(device=self.model.device)
@@ -145,16 +144,24 @@ class InternVL2ClassifyABModel(nn.Module):
             input_ids=input_ids,
             attention_mask=attention_mask,
             image_flags=image_flags,
-            labels = labels,
+            labels=labels,
             use_cache=False,
             output_hidden_states=True,
             return_dict=True,
         )
-        logits = transformer_output.logits # (bsz, seq_len, vocal_size)
+        
+        logits = transformer_output.logits  # (bsz, seq_len, vocal_size)
         loss = transformer_output.loss
-        score = logits[:, self.token_position, [self.b_token_id,self.a_token_id]] # (bsz, 2)
-        score = nn.Softmax(dim=1)(score) # (bsz, 2)
-        score = score[:, 1].view(-1) # (bsz) # 只返回正例得分
+        bsz = logits.size(0)
+        padding_side = "right" if self.training else "left"
+        last_idx = self.get_last_input_idx(
+            input_ids, padding_side=padding_side, wanted_last_idx=self.token_position
+        )
+        bsz_idx = torch.arange(bsz)
+        score = logits[bsz_idx, last_idx, :]  # (bsz, vocal_size)
+        score = score[:, [self.b_token_id, self.a_token_id]]  # (bsz, 2)
+        score = nn.Softmax(dim=1)(score)  # (bsz, 2)
+        score = score[:, 1].view(-1)  # (bsz) # 只返回正例得分
         score = score.detach().to(torch.float32).cpu().numpy().tolist()
         return loss, score
 
@@ -190,7 +197,7 @@ class InternVL2ClassifyABModel(nn.Module):
         )
         self.model.language_model.enable_input_require_grads()
         # self.model.language_model.print_trainable_parameters()
-    
+
     def batch_chat(self, *arg, **kwargs):
         return self.model.batch_chat(*arg, **kwargs)
 
@@ -199,3 +206,24 @@ class InternVL2ClassifyABModel(nn.Module):
 
     def generate(self, *arg, **kwargs):
         return self.model.generate(*arg, **kwargs)
+
+    def get_last_input_idx(self, input_ids, padding_side="right", wanted_last_idx: int = -1):
+        pass
+        bsz, _ = input_ids.shape
+        if padding_side == "left":
+            return torch.tensor([wanted_last_idx] * bsz)
+        elif padding_side == "right":
+            device = input_ids.device
+            temp_pad = torch.tensor([self.pad_id] * bsz).long().view(bsz, -1)  # [bsz,1]
+            temp_pad = temp_pad.to(device)
+            temp_input_ids = torch.cat([input_ids, temp_pad], dim=1)
+            last_idx = []
+            for i in range(bsz):
+                temp = temp_input_ids[i]
+                #
+                t = torch.nonzero(temp == self.pad_id, as_tuple=True)
+                last_idx.append(t[0].min() - wanted_last_idx)
+            assert all([i >= 0 for i in last_idx])
+            return torch.stack(last_idx)
+        else:
+            raise ValueError(f"padding_side {padding_side} is not supported")
