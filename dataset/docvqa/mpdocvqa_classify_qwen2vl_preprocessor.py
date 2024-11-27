@@ -90,13 +90,12 @@ class MPDocVQAClassifyQwen2VLPreprocessor(BasePreprocessor):
         label = "B" if cls_label == 0 else "A"
 
         image = Image.open(image_path).convert("RGB")
-
         # 分类的input
         _, classify_conversation = self.get_prompt(
             prompt_template=prompt_template_for_classify,
             image=self.template.image_placeholder,
             question=question,
-            answer="A" if cls_label == 1 else "B",
+            answer=label,
         )
         classify_text = self.get_text(
             classify_conversation,
