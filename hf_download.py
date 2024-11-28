@@ -17,6 +17,6 @@ def download_model(repo_id, local_dir, **kwargs):
 
 if __name__ == "__main__":
     download_model(
-        repo_id="OpenGVLab/InternVL2-2B",
-        local_dir="/root/autodl-tmp/pretrain-model/InternVL2-2B",
+        repo_id="Qwen/Qwen-VL-Chat-Int4",
+        local_dir="/root/autodl-tmp/pretrain-model/Qwen-VL-Chat-Int4",
     )

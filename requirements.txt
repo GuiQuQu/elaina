@@ -19,3 +19,10 @@ ninja
 flash-attn
 python-Levenshtein
 open_clip_torch
+
+# for qwenvl
+tiktoken
+matplotlib
+transformers_stream_generator
+optimum
+auto-gptq

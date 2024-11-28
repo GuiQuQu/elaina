@@ -45,12 +45,13 @@
         "type": "tester.hf_tester.DefaultTester",
         "output_dir": "outputs/MPDocVQA/internvl2_lora_classify_output/test_result",
         "checkpoint_list": [
-            "outputs/MPDocVQA/internvl2_lora_classify_output/checkpoint-40000/model.safetensors",
-            "outputs/MPDocVQA/internvl2_lora_classify_output/checkpoint-35000/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_classify_output/checkpoint-30000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_classify_output/checkpoint-35000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_classify_output/checkpoint-41185/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
-            "batch_size" : 8,
+            "batch_size" : 10,
             "num_workers": 4,
             "shuffle": false
         },
@@ -84,7 +85,7 @@
         "warmup_ratio": 0.1,
         "evaluation_strategy": "no",
         "save_strategy": "steps",
-        "save_steps": 5000,
+        "save_steps": 10000,
         "save_safetensors": true,
         "save_total_limit": 5,
         "logging_strategy": "steps",
