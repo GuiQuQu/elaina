@@ -24,3 +24,21 @@ def truncate_layout(
             is_truncated = True
             break
     return "\n".join(reserved_lines), is_truncated
+
+def truncate_layout_by_length(
+        layout: str, tokenizer: PreTrainedTokenizer = None, max_token_length: int = 1024
+) -> Tuple[str, bool]:
+    """
+        强制按照max_token_length截断layout
+    """
+    if tokenizer == None:
+        return layout
+    is_truncated = False
+    layout_input_ids = tokenizer(layout, return_tensors="pt").input_ids
+    layout_input_ids = layout_input_ids.squeeze()
+    if layout_input_ids.size(0) > max_token_length:
+        is_truncated = True
+    layout_input_ids = layout_input_ids[:max_token_length]
+    layout = tokenizer.decode(layout_input_ids)
+    return layout, is_truncated
+

@@ -5,7 +5,7 @@ from utils.utils import load_config
 
 def get_args():
     parser = argparse.ArgumentParser(description="elania Training")
-    parser.add_argument("--config_file", type=str, default=None, help="The config file")
+    parser.add_argument("--config_file", "--config", type=str, default=None, help="The config file")
     parser.add_argument("--do_train", action="store_true")
     parser.add_argument("--do_test", action="store_true")
     parser.add_argument("--do_eval", action="store_true")

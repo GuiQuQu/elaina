@@ -118,7 +118,7 @@ class DocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
             layout = layout if self.use_ocr else None,
         )
         train_text = self.get_text(train_conversation, add_generation_prompt=False)
-        # test_text = self.get_text(test_conversation, add_generation_prompt=True)
+        test_text = self.get_text(test_conversation, add_generation_prompt=True)
         
         train_inputs = self.processor(
             text = [train_text],
@@ -128,6 +128,8 @@ class DocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
             max_length = self.max_seq_length,
             return_tensors="pt",
         )
+        if train_inputs['input_ids'].size(-1) != self.max_seq_length:
+            logger.warning(f"input_ids size: {train_inputs['input_ids'].size()} is not equal to max_seq_length: {self.max_seq_length}")
         train_labels = generate_labels(
             train_inputs["input_ids"],
             [train_text],
@@ -136,6 +138,14 @@ class DocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
             self.template,
             replace_text=True,
             image_grid_thw=train_inputs["image_grid_thw"],
+        )
+        test_inputs = self.processor(
+            text = [test_text],
+            images = [image],
+            videos=None,
+            padding="max_length",
+            max_length = self.max_seq_length,
+            return_tensors="pt",
         )
         model_inputs = dict()
         extra = dict(
@@ -155,6 +165,12 @@ class DocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
                 input_ids=train_inputs["input_ids"].squeeze(),
                 attention_mask=train_inputs["attention_mask"].squeeze(),
                 labels=train_labels.squeeze(),
+                
+                # test input 
+                test_pixel_values=test_inputs["pixel_values"],
+                test_image_grid_thw=test_inputs["image_grid_thw"].squeeze(),
+                test_input_ids=test_inputs["input_ids"].squeeze(),
+                test_attention_mask=test_inputs["attention_mask"].squeeze(),
             )
         )
         return model_inputs

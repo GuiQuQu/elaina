@@ -1,12 +1,14 @@
 {
+    "registry_paths": ["dataset/docvqa", "metrics"],
     "train_dataset": {
         "type": "dataset.docvqa.docvqa_vqa_dataset.DocVQAVqaDataset",
         "dataset_path": "/root/autodl-tmp/SPDocVQA",
         "file_name": "train_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "type": "docvqa_vqa_qwenvl_plain_ocr_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat",
+            "max_seq_length": 2048,
+            "max_layout_length": 1024
         }
     },
     "val_dataset": {
@@ -14,9 +16,10 @@
         "dataset_path": "/root/autodl-tmp/SPDocVQA",
         "file_name": "val_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "type": "docvqa_vqa_qwenvl_plain_ocr_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat",
+            "max_seq_length": 2048,
+            "max_layout_length": 1024
         }
     },
     "test_dataset": {
@@ -24,26 +27,25 @@
         "dataset_path": "/root/autodl-tmp/SPDocVQA",
         "file_name": "val_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "type": "docvqa_vqa_qwenvl_plain_ocr_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat",
+            "max_seq_length": 2048,
+            "max_layout_length": 1024
         }
     },
     "model": {
-        "type": "models.docvqa.internvl2_vqa_model.InternVL2VQAModel",
-        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "use_backbone_lora": 0,
-        "use_llm_lora": 128,
+        "type": "qwenvl_vqa_model",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat",
+        "use_qwenvl_lora": 8,
         "freeze_vision_model": true,
-        "freeze_llm_model": true,
-        "frzzze_mlp": true,
+        "gradient_checkpointing":true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output",
-    "data_collator": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
+    "output_dir": "/root/autodl-tmp/outputs/SPDocVQA/qwenvl_plain_ocr_lora_output",
+    "data_collator": "default_concat_collator",
     "tester": {
-        "type": "tester.internvl2_tester.InternVL2Tester",
-        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+        "type": "custom_tester",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat",
         "output_dir": "outputs/SPDocVQA/vqa_lora_output/test_result",
         "test_raw_model": false,
         "generation_config": {
@@ -66,7 +68,7 @@
             }
         ]
     },
-    "trainer": "trainer.hf_trainer.HFTrainer",
+    "trainer": "hf_trainer",
     "training_args": {
         "do_train": true,
         "do_eval": false,
@@ -78,10 +80,10 @@
         "gradient_checkpointing_kwargs": { "use_reentrant": false },
         "remove_unused_columns": true,
         "num_train_epochs": 1,
-        "per_device_train_batch_size": 4,
+        "per_device_train_batch_size": 1,
         "dataloader_pin_memory": true,
         "dataloader_prefetch_factor ": 1,
-        "dataloader_num_workers": 4,
+        "dataloader_num_workers": 0,
         "gradient_accumulation_steps": 8,
         "optim": "adamw_torch",
         "learning_rate": 1e-5,

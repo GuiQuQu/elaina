@@ -99,6 +99,16 @@ def segments2lines(segments: list):
     return result
 
 
+def transfrom_ocr2plain_text(ocr_path):
+    """
+        返回ocr识别的所有的文本段,并将其使用空格拼接成一个字符串
+    """
+    ocr_data = sp_open_ocr_data(ocr_path)
+    if len(ocr_data["segments"]) == 0:
+        return ""
+    segments = ocr_data["segments"]
+    return " ".join([seg["text"] for seg in segments])
+
 def transform_ocr2layout(ocr_path, placeholder=" "):
     ocr_data = sp_open_ocr_data(ocr_path)
     if len(ocr_data["segments"]) == 0:
