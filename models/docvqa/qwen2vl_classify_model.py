@@ -144,6 +144,16 @@ class Qwen2VLClassifyModel(nn.Module):
             cls_loss = loss_fct(logits, cls_label)
         return cls_loss, outputs
 
+    def inference_forward(
+        self, pixel_values, input_ids, attention_mask, image_grid_thw
+    ):
+        return self.forward(
+            pixel_values=pixel_values,
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            image_grid_thw=image_grid_thw,
+        )
+
     def get_last_one_hidden_states(
         self, hidden_states, input_ids, padding_on_left=False
     ):
