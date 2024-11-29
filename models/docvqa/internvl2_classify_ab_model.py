@@ -149,7 +149,7 @@ class InternVL2ClassifyABModel(nn.Module):
             output_hidden_states=True,
             return_dict=True,
         )
-        
+        breakpoint()
         logits = transformer_output.logits  # (bsz, seq_len, vocal_size)
         loss = transformer_output.loss
         bsz = logits.size(0)
@@ -164,6 +164,47 @@ class InternVL2ClassifyABModel(nn.Module):
         score = score[:, 1].view(-1)  # (bsz) # 只返回正例得分
         score = score.detach().to(torch.float32).cpu().numpy().tolist()
         return loss, score
+
+    def inference_forward(
+        self,
+        # pixel_values,
+        test_pixel_values,
+        # input_ids,
+        # attention_mask,
+        image_flags,
+        test_input_ids,
+        test_attention_mask,
+    ):
+        # loss = None
+
+        test_pixel_values = test_pixel_values.to(dtype=self.model.dtype, device=self.model.device)
+        test_input_ids = test_input_ids.to(device=self.model.device)
+        test_attention_mask = test_attention_mask.to(device=self.model.device)
+        image_flags = image_flags.to(device=self.model.device)
+
+        transformer_output = self.model(
+            pixel_values=test_pixel_values,
+            input_ids=test_input_ids,
+            attention_mask=test_attention_mask,
+            image_flags=image_flags,
+            use_cache=True,
+            output_hidden_states=True,
+            return_dict=True,
+        )
+        logits = transformer_output.logits  # (bsz, seq_len, vocal_size)
+        # loss = transformer_output.loss
+        bsz = logits.size(0)
+        padding_side = "right" if self.training else "left"
+        last_idx = self.get_last_input_idx(
+            test_input_ids, padding_side=padding_side, wanted_last_idx=self.token_position
+        )
+        bsz_idx = torch.arange(bsz)
+        score = logits[bsz_idx, last_idx, :]  # (bsz, vocal_size)
+        score = score[:, [self.b_token_id, self.a_token_id]]  # (bsz, 2)
+        score = nn.Softmax(dim=1)(score)  # (bsz, 2)
+        score = score[:, 1].view(-1)  # (bsz) # 只返回正例得分
+        score = score.detach().to(torch.float32).cpu().numpy().tolist()
+        return None, score
 
     def wrap_backbone_lora(self, r=128, lora_alpha=256, lora_dropout=0.05):
         lora_config = LoraConfig(
@@ -207,7 +248,9 @@ class InternVL2ClassifyABModel(nn.Module):
     def generate(self, *arg, **kwargs):
         return self.model.generate(*arg, **kwargs)
 
-    def get_last_input_idx(self, input_ids, padding_side="right", wanted_last_idx: int = -1):
+    def get_last_input_idx(
+        self, input_ids, padding_side="right", wanted_last_idx: int = -1
+    ):
         pass
         bsz, _ = input_ids.shape
         if padding_side == "left":
