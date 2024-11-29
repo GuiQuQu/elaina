@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from peft import PeftModel, PeftConfig
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoConfig, GPTQConfig
+from transformers import AutoModelForCausalLM, AutoConfig, GPTQConfig,GenerationConfig
 from transformers import set_seed
 
 # 内部函数
@@ -15,11 +15,7 @@ from models.docvqa.qwenvl.tokenization_qwen import QWenTokenizer
 from dataset.build import build_dataset
 from dataset.default_collator import default_collate
 from metrics.build import build_metrics
-from utils.utils import (
-    load_config,
-    get_cls_or_func,
-    delete_not_used_key_from_batch
-)
+from utils.utils import load_config, get_cls_or_func, delete_not_used_key_from_batch
 from utils.register import registry_pycls_by_path
 from logger import logger
 
@@ -34,23 +30,25 @@ def load_qwenvl_lora(adapter_name_or_path):
         torch_dtype="auto",
         device_map="auto",
         trust_remote_code=True,
+        low_cpu_mem_usage=True,
     )
     lora_model = PeftModel.from_pretrained(model, adapter_name_or_path)
     lora_model.eval()
     # gptq 量化的模型不能merge ...
     # lora_model.base_model.merge_and_unload()
-    print(
+    logger.info(
         f"'{adapter_name_or_path}' loaded, dtype is '{next(lora_model.parameters()).dtype}'"
     )
-    for _, p in model.named_parameters():
+
+    for _, p in lora_model.named_parameters():
         p.requires_grad = False
     lora_model.base_model.use_cache = True
     return lora_model
 
 
-def load_qwenvl_model(model_name_or_path: str, use_lora, q_lora):
+def load_qwenvl_model(model_name_or_path: str):
     """
-    load qwen-vl-chat-int4
+    load qwen-vl-chat-int4 or qwen-vl-chat
     """
     config = AutoConfig.from_pretrained(
         model_name_or_path,
@@ -58,15 +56,11 @@ def load_qwenvl_model(model_name_or_path: str, use_lora, q_lora):
     )
     config.use_cache = True
     model = AutoModelForCausalLM.from_pretrained(
-        model_name_or_path,
-        config=config,
-        device_map="auto",
-        trust_remote_code=True,
-        quantization_config=(
-            GPTQConfig(bits=4, disable_exllama=True) if use_lora and q_lora else None
-        ),
+        model_name_or_path, config=config, device_map="auto", trust_remote_code=True
     )
+
     return model
+
 
 def get_stop_words_ids(chat_format, tokenizer):
     if chat_format == "raw":
@@ -76,6 +70,7 @@ def get_stop_words_ids(chat_format, tokenizer):
     else:
         raise NotImplementedError(f"Unknown chat format {chat_format!r}")
     return stop_words_ids
+
 
 class QwenVLQLoraTester(object):
     def __init__(
@@ -95,8 +90,12 @@ class QwenVLQLoraTester(object):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
+        # self.dataloader_config = dataloader_config
         self._create_dataloader(dataloader_config)
-        self.tokenizer:QWenTokenizer = QWenTokenizer.from_pretrained(model_path)
+        self.tokenizer: QWenTokenizer = QWenTokenizer.from_pretrained(
+            model_path, padding_side="left", use_fast=False, trust_remote_code=True
+        )
+        self.generation_config = GenerationConfig.from_pretrained(self.model_path)
         self.checkpoint_list = checkpoint_list
         self.checkpoint_0_path = "parents/checkpoint-0"
         if test_raw_model:
@@ -105,6 +104,7 @@ class QwenVLQLoraTester(object):
     def test(self):
         for checkpoint_path in self.checkpoint_list:
             model = self.load_checkpoint(checkpoint_path)
+            
             # model to cuda
             if torch.cuda.is_available():
                 LOCAL_RANK = int(os.environ.get("LOCAL_RANK", "0"))
@@ -112,7 +112,7 @@ class QwenVLQLoraTester(object):
             result = self.test_one_checkpoint(model)
             del model
             gc.collect()
-            torch.cuda.empty_cache
+            torch.cuda.empty_cache()
             # save result to output_dir
             save_path = os.path.join(
                 self.output_dir, f"{checkpoint_path.split('/')[-1]}-result.json"
@@ -131,7 +131,7 @@ class QwenVLQLoraTester(object):
         gc.collect()
         torch.cuda.empty_cache()
         if checkpoint_path == self.checkpoint_0_path:
-            model = load_qwenvl_model(self.model_path, use_lora=True, q_lora=True)
+            model = load_qwenvl_model(self.model_path)
             logger.info(
                 f"[Model load], load qwenvl without checkpoint, only load model from {self.model_path}"
             )
@@ -142,26 +142,33 @@ class QwenVLQLoraTester(object):
             )
         model.eval()
         model.requires_grad_(False)
+        gc.collect()
+        torch.cuda.empty_cache()
         return model
 
     def run_model(self, model, batch: dict) -> List[Any]:
         # model_input_batch, delete_batch = delete_not_used_key_from_batch(model, batch)
+        
+        device = next(model.parameters()).device
         test_input_ids = batch["test_input_ids"]
         test_attention_mask = batch["test_attention_mask"]
-        generation_config = model.generation_config
+        test_input_ids = test_input_ids.to(device)
+        test_attention_mask = test_attention_mask.to(device)
+
         stop_words_ids = get_stop_words_ids(
-            generation_config.chat_format, self.tokenizer
+            self.generation_config.chat_format, self.tokenizer
         )
 
-        generated_ids = self.generate(
+        generated_ids = model.generate(
             input_ids=test_input_ids,
             attention_mask=test_attention_mask,
             stop_words_ids=stop_words_ids,
             return_dict_in_generate=False,
-            generation_config=generation_config,
+            generation_config=self.generation_config,
         )
         generated_ids_trimmed = [
-            out_ids[len(in_ids) :] for in_ids, out_ids in zip(test_input_ids, generated_ids)
+            out_ids[len(in_ids) :]
+            for in_ids, out_ids in zip(test_input_ids, generated_ids)
         ]
         output_text = self.tokenizer.batch_decode(
             generated_ids_trimmed,
@@ -169,7 +176,7 @@ class QwenVLQLoraTester(object):
             clean_up_tokenization_spaces=False,
         )
         return output_text
-    
+
     def _split_output_and_save_extra_info(
         self, model_outputs: list, batch: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
@@ -203,6 +210,8 @@ class QwenVLQLoraTester(object):
     @torch.no_grad()
     def test_one_checkpoint(self, model) -> List[Dict[str, Any]]:
         result = []
+        gc.collect()
+        torch.cuda.empty_cache()
         for i, batch in enumerate(
             tqdm(self.dataloader, desc="Testing", total=self.max_steps)
         ):
@@ -289,6 +298,8 @@ def get_tester_config(elaina_config):
     if data_collator and "dataloader_config" in tester_config:
         if tester_config["dataloader_config"].get("data_collator", None) is None:
             tester_config["dataloader_config"]["data_collator"] = data_collator
+
+    return tester_config
 
 
 def main():

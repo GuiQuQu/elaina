@@ -139,9 +139,15 @@ class DocVQAVqaQwenVLPlainOCRPreprocessor(BasePreprocessor):
             tokenizer=self.tokenizer,
             template=self.template,
         )
+
+        # 推理用数据left padding
+        original_padding_side = self.tokenizer.padding_side
+        self.tokenizer.padding_side = "left"
         test_inputs = self.tokenizer(
             test_text, return_tensors="pt", padding="max_length", truncation=True, max_length=self.max_seq_length
         )
+        self.tokenizer.padding_side = original_padding_side
+        
         model_inputs = dict()
         extra = dict(
             qid=qid,

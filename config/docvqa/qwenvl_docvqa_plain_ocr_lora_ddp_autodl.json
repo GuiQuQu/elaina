@@ -45,20 +45,15 @@
     "data_collator": "default_concat_collator",
     "tester": {
         "type": "custom_tester",
-        "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat",
-        "output_dir": "outputs/SPDocVQA/vqa_lora_output/test_result",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen-VL-Chat-Int4",
+        "output_dir": "outputs/SPDocVQA/qwenvl_plain_ocr_lora_output/test_result",
         "test_raw_model": false,
-        "generation_config": {
-            "max_new_tokens": 128,
-            "do_sample": false
-        },
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output/checkpoint-1000/model.safetensors",
-            "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output/checkpoint-1233/model.safetensors"
+            "/root/autodl-tmp/outputs/SPDocVQA/qwenvl_plain_ocr_lora_output/checkpoint-4000"
         ],
         "dataloader_config": {
             "max_steps": -1,
-            "batch_size": 8,
+            "batch_size": 4,
             "num_workers": 4,
             "shuffle": false
         },

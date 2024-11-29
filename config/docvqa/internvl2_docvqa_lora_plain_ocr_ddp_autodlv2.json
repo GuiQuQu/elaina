@@ -4,9 +4,10 @@
         "dataset_path": "/root/autodl-tmp/SPDocVQA",
         "file_name": "train_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
+            "type": "docvqa_vqa_internvl2_plain_ocr_preprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "max_seq_length": 3283,
+            "max_layout_length": 1024
         }
     },
     "val_dataset": {
@@ -14,9 +15,10 @@
         "dataset_path": "/root/autodl-tmp/SPDocVQA",
         "file_name": "val_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
+            "type": "docvqa_vqa_internvl2_plain_ocr_preprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "max_seq_length": 3283,
+            "max_layout_length": 1024
         }
     },
     "test_dataset": {
@@ -24,9 +26,10 @@
         "dataset_path": "/root/autodl-tmp/SPDocVQA",
         "file_name": "val_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
+            "type": "docvqa_vqa_internvl2_plain_ocr_preprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "max_seq_length": 3283,
+            "max_layout_length": 1024
         }
     },
     "model": {
@@ -39,20 +42,20 @@
         "frzzze_mlp": true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output",
-    "data_collator": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
+    "output_dir": "/root/autodl-tmp/outputs/SPDocVQA/vqa_ocr_output",
+    "data_collator": "dataset.docvqa.collator.internvl2_concat_collator",
     "tester": {
         "type": "tester.internvl2_tester.InternVL2Tester",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "output_dir": "outputs/SPDocVQA/vqa_lora_output/test_result",
-        "test_raw_model": false,
+        "output_dir": "outputs/SPDocVQA/vqa_ocr_output/test_result",
         "generation_config": {
             "max_new_tokens": 128,
             "do_sample": false
         },
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output/checkpoint-1000/model.safetensors",
-            "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output/checkpoint-1233/model.safetensors"
+            "/root/autodl-tmp/outputs/SPDocVQA/vqa_ocr_output/checkpoint-1000/model.safetensors",
+            "/root/autodl-tmp/outputs/SPDocVQA/vqa_ocr_output/checkpoint-4000/model.safetensors",
+            "/root/autodl-tmp/outputs/SPDocVQA/vqa_ocr_output/checkpoint-4932/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
@@ -78,11 +81,11 @@
         "gradient_checkpointing_kwargs": { "use_reentrant": false },
         "remove_unused_columns": true,
         "num_train_epochs": 1,
-        "per_device_train_batch_size": 4,
+        "per_device_train_batch_size": 2,
         "dataloader_pin_memory": true,
         "dataloader_prefetch_factor ": 1,
-        "dataloader_num_workers": 4,
-        "gradient_accumulation_steps": 2,
+        "dataloader_num_workers": 0,
+        "gradient_accumulation_steps": 4,
         "optim": "adamw_torch",
         "learning_rate": 1e-5,
         "max_grad_norm": 1.0,

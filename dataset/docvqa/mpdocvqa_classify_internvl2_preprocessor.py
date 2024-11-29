@@ -1,3 +1,6 @@
+"""
+    同时指出ab式分类和mlp分类头式分类
+"""
 from PIL import Image
 import torch
 

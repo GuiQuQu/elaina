@@ -1,37 +1,40 @@
 {
     "train_dataset": {
         "type": "dataset.docvqa.docvqa_vqa_dataset.DocVQAVqaDataset",
-        "dataset_path": "/root/autodl-tmp/SPDocVQA",
+        "dataset_path": "/home/khuang@kean.edu/wty/wkl/SPDocVQA",
         "file_name": "train_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "type": "dataset.docvqa.docvqa_vqa_internvl2_ocr_preprocessor.DocVQAVqaInternVL2OCRPreprocessor",
+            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/InternVL2-2B",
+            "max_seq_length": 2560,
+            "max_layout_length": 640
         }
     },
     "val_dataset": {
         "type": "dataset.docvqa.docvqa_vqa_dataset.DocVQAVqaDataset",
-        "dataset_path": "/root/autodl-tmp/SPDocVQA",
+        "dataset_path": "/home/khuang@kean.edu/wty/wkl/SPDocVQA",
         "file_name": "val_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "type": "dataset.docvqa.docvqa_vqa_internvl2_ocr_preprocessor.DocVQAVqaInternVL2OCRPreprocessor",
+            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/InternVL2-2B",
+            "max_seq_length": 2560,
+            "max_layout_length": 640
         }
     },
     "test_dataset": {
         "type": "dataset.docvqa.docvqa_vqa_dataset.DocVQAVqaDataset",
-        "dataset_path": "/root/autodl-tmp/SPDocVQA",
+        "dataset_path": "/home/khuang@kean.edu/wty/wkl/SPDocVQA",
         "file_name": "val_v1.0_withQT",
         "preprocess_config": {
-            "type": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.DocVQAVqaInternVL2Preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048
+            "type": "dataset.docvqa.docvqa_vqa_internvl2_ocr_preprocessor.DocVQAVqaInternVL2OCRPreprocessor",
+            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/InternVL2-2B",
+            "max_seq_length": 2560,
+            "max_layout_length": 640
         }
     },
     "model": {
         "type": "models.docvqa.internvl2_vqa_model.InternVL2VQAModel",
-        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+        "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/InternVL2-2B",
         "use_backbone_lora": 0,
         "use_llm_lora": 128,
         "freeze_vision_model": true,
@@ -39,24 +42,25 @@
         "frzzze_mlp": true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output",
-    "data_collator": "dataset.docvqa.docvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
+    "output_dir": "/home/khuang@kean.edu/wty/wkl/outputs/SPDocVQA/vqa_lora_ocr_output",
+    "data_collator": "dataset.docvqa.collator.internvl2_concat_collator",
     "tester": {
         "type": "tester.internvl2_tester.InternVL2Tester",
-        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "output_dir": "outputs/SPDocVQA/vqa_lora_output/test_result",
+        "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/InternVL2-2B",
+        "output_dir": "outputs/SPDocVQA/vqa_lora_ocr_output/test_result",
         "test_raw_model": false,
         "generation_config": {
             "max_new_tokens": 128,
             "do_sample": false
         },
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output/checkpoint-1000/model.safetensors",
-            "/root/autodl-tmp/outputs/SPDocVQA/vqa_lora_output/checkpoint-1233/model.safetensors"
+            "/home/khuang@kean.edu/wty/wkl/outputs/SPDocVQA/vqa_ocr_output/checkpoint-1000/model.safetensors",
+            "/home/khuang@kean.edu/wty/wkl/outputs/SPDocVQA/vqa_ocr_output/checkpoint-4000/model.safetensors",
+            "/home/khuang@kean.edu/wty/wkl/outputs/SPDocVQA/vqa_ocr_output/checkpoint-4932/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
-            "batch_size": 8,
+            "batch_size": 4,
             "num_workers": 4,
             "shuffle": false
         },
@@ -78,11 +82,11 @@
         "gradient_checkpointing_kwargs": { "use_reentrant": false },
         "remove_unused_columns": true,
         "num_train_epochs": 1,
-        "per_device_train_batch_size": 4,
+        "per_device_train_batch_size": 2,
         "dataloader_pin_memory": true,
         "dataloader_prefetch_factor ": 1,
         "dataloader_num_workers": 4,
-        "gradient_accumulation_steps": 2,
+        "gradient_accumulation_steps": 4,
         "optim": "adamw_torch",
         "learning_rate": 1e-5,
         "max_grad_norm": 1.0,
