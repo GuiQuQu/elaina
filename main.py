@@ -9,6 +9,8 @@ from utils.utils import check_environment
 from utils.register import registry_pycls_by_path
 from utils.register import Register
 
+from logger import init_transformer_logger
+
 def initialize_by_config(config):
     registry_paths = config['registry_paths']
     for path in registry_paths:
@@ -17,6 +19,7 @@ def initialize_by_config(config):
     set_seed(config['seed'])
 
 def main():
+    init_transformer_logger()
     check_environment()
     args = get_args()
     config = get_config_from_args(args)
