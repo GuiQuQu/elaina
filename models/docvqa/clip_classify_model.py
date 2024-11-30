@@ -15,6 +15,7 @@ except ImportError:
     has_distributed = False
 
 from utils.dist_variable import DistVarible
+from utils.register import Register
 
 HF_HUB_PREFIX = "hf-hub:"
 
@@ -134,11 +135,11 @@ class ClipLoss(nn.Module):
         return {"contrastive_loss": total_loss} if output_dict else total_loss
 
 
-
+@Register(name="eva02_clip")
 class EVA02CLIP(nn.Module):
     def __init__(
         self,
-        cpkt_path: str,
+        model_path: str,
         model_name: str = "EVA02-L-14",
         tokenizer_path: Optional[str] = None,
         file_name: str = "open_clip_pytorch_model.bin",
@@ -148,7 +149,7 @@ class EVA02CLIP(nn.Module):
         gather_with_grad = True,
     ):
         super().__init__()
-        cpkt_file = cpkt_path + "/" + file_name
+        cpkt_file = model_path + "/" + file_name
         self.model, self.preprocess_train, self.preprocess_val = (
             open_clip.create_model_and_transforms(
                 model_name=model_name,
@@ -159,7 +160,7 @@ class EVA02CLIP(nn.Module):
             )
         )
         if tokenizer_path is None:
-            tokenizer_path = cpkt_path
+            tokenizer_path = model_path
         self.tokenizer = open_clip.get_tokenizer(HF_HUB_PREFIX + tokenizer_path)
 
         self.loss = ClipLoss(
@@ -170,10 +171,13 @@ class EVA02CLIP(nn.Module):
             world_size=DistVarible.world_size,
         )
 
-    def encode_image(self, image, normalize=True):
+    def enable_gradient_checkpointing(self,gradient_checkpointing_kwargs = None):
+        self.model.set_grad_checkpointing(enable=True)
+
+    def encode_image(self, image:torch.Tensor, normalize=True):
         return self.model.encode_image(image, normalize)
 
-    def encode_text(self, text, normalize=True):
+    def encode_text(self, text:torch.Tensor, normalize=True):
         return self.model.encode_text(text, normalize)
 
     def get_logits(self, image, text):

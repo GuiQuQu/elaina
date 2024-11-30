@@ -7,6 +7,7 @@ import os
 from typing import List, Dict
 import math
 
+from logger import logger
 
 class Point(object):
     def __init__(self, x, y) -> None:
@@ -156,6 +157,7 @@ def transform_ocr2layout(ocr_path, placeholder=" "):
     ocr_data = mp_open_data(ocr_path)
 
     if len(ocr_data["segments"]) == 0:
+        logger.warning(f"ocr_data is empty, ocr_path: {ocr_path}")
         return ""
     # 划分行
     ocr_data["lines"] = segments2lines(ocr_data["segments"])
