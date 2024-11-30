@@ -43,8 +43,8 @@
         "output_dir": "outputs/MPDocVQA/qwen2vl_classify_output/test_result",
         "test_raw_model": true,
         "checkpoint_list": [
-            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-30000/pytorch_model.bin",
-            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_ally_output/checkpoint-41184/pytorch_model.bin"
+            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-30000/pytorch_model.bin",
+            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-41184/pytorch_model.bin"
         ],
         "dataloader_config": {
             "max_steps": -1,
