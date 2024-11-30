@@ -34,8 +34,12 @@ def truncate_layout_by_length(
     if tokenizer == None:
         return layout
     is_truncated = False
+    
+    if len(layout) == 0:
+        return layout, is_truncated
+    
     layout_input_ids = tokenizer(layout, return_tensors="pt").input_ids
-    layout_input_ids = layout_input_ids.squeeze()
+    layout_input_ids = layout_input_ids.squeeze(0)
     if layout_input_ids.size(0) > max_token_length:
         is_truncated = True
     layout_input_ids = layout_input_ids[:max_token_length]

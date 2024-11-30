@@ -57,18 +57,13 @@
         "metrics": [
             {
                 "type": "metrics.auc_metrics.AUCMetrics",
-                "pred_key": "score",
+                "pred_key": "model_output",
                 "label_key": "classify_label"
             },
             {
                 "type": "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics",
-                "pred_key": "score",
+                "pred_key": "model_output",
                 "label_key": "classify_label"
-            },
-            {
-                "type": "metrics.docvqa_metrics.mp_anls_metrics.MPDocVQAANLSMetrics",
-                "pred_key": "resp",
-                "answers_key": "answers"
             }
         ]
     },
