@@ -29,8 +29,7 @@
     "model": {
         "type": "eva02_clip",
         "model_path": "/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k",
-        "precision": "fp16",
-        "device": "cpu",
+        "precision": "fp32",
         "local_loss" : true,
         "gather_with_grad": true
     },
@@ -41,14 +40,17 @@
         "test_raw_model" : true,
         "output_dir" : "outputs/MPDocVQA/clip_classify_output",
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-35000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-25000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-41184/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-5665/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-10197/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-15862/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-20394/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-26059/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-32857/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
-            "batch_size" : 6,
-            "num_workers": 4,
+            "batch_size" : 64,
+            "num_workers": 8,
             "shuffle": false
         },
         "metrics": [
@@ -65,11 +67,11 @@
         "overwrite_output_dir": true,
         "bf16": false,
         "fp16": true,
-        "gradient_checkpointing": true,
+        "gradient_checkpointing": false,
         "gradient_checkpointing_kwargs":{"use_reentrant": false},
         "remove_unused_columns": true,
-        "num_train_epochs": 1,
-        "per_device_train_batch_size": 64,
+        "num_train_epochs": 30,
+        "per_device_train_batch_size": 32,
         "dataloader_pin_memory": true,
         "dataloader_prefetch_factor ": 2,
         "dataloader_num_workers": 4,
@@ -81,10 +83,10 @@
         "lr_scheduler_type": "cosine",
         "warmup_ratio": 0.1,
         "evaluation_strategy": "no",
-        "save_strategy": "steps",
+        "save_strategy": "epoch",
         "save_steps": 5000,
         "save_safetensors": true,
-        "save_total_limit": 5,
+        "save_total_limit": 40,
         "logging_strategy": "steps",
         "logging_steps": 10,
         "report_to": "tensorboard"

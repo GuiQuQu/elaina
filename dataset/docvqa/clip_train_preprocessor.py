@@ -25,7 +25,7 @@ class CLIPTrainPreprocessor(BasePreprocessor):
         super().__init__()
         config_path = os.path.join(model_path, "open_clip_config.json")
         self.config = load_json(config_path)
-        pp_config = PreprocessCfg(**self.config.preprocess_cfg)
+        pp_config = PreprocessCfg(**self.config['preprocess_cfg'])
         self.train_transform = image_transform_v2(pp_config,is_train = True)
         self.tokenizer = get_tokenizer(HF_HUB_PREFIX + model_path)
     
@@ -68,7 +68,7 @@ class CLIPTrainPreprocessor(BasePreprocessor):
         super().__init__()
         config_path = os.path.join(model_path, "open_clip_config.json")
         self.config = load_json(config_path)
-        pp_config = PreprocessCfg(**self.config.preprocess_cfg)
+        pp_config = PreprocessCfg(**self.config['preprocess_cfg'])
         self.test_transform = image_transform_v2(pp_config,is_train = False)
         self.tokenizer = get_tokenizer(HF_HUB_PREFIX + model_path)
     
@@ -87,7 +87,7 @@ class CLIPTrainPreprocessor(BasePreprocessor):
             image_path=image_path,
             ocr_path=ocr_path,
             question=question,
-            cls_label=cls_label,
+            label=cls_label,
         )
         image = Image.open(image_path).convert("RGB")
         image = self.test_transform(image).squeeze(0) # [C,H,W]

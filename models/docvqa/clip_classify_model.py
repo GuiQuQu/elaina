@@ -135,6 +135,17 @@ class ClipLoss(nn.Module):
         return {"contrastive_loss": total_loss} if output_dict else total_loss
 
 
+def get_torch_dtype(model_dtype: str):
+    if model_dtype == "bf16":
+        return torch.bfloat16
+    elif model_dtype == "fp16":
+        return torch.float16
+    elif model_dtype == "fp32":
+        return torch.float32
+    else:
+        raise ValueError(f"model_dtype {model_dtype} is not supported")
+
+
 @Register(name="eva02_clip")
 class EVA02CLIP(nn.Module):
     def __init__(
@@ -150,6 +161,8 @@ class EVA02CLIP(nn.Module):
     ):
         super().__init__()
         cpkt_file = model_path + "/" + file_name
+        # 使用amp进行混合精度训练(fp32,fp16)的模型, 模型的初始化权重类型必须是fp32
+        # 只有推理的模型模型才能转fp16进行推理
         self.model, self.preprocess_train, self.preprocess_val = (
             open_clip.create_model_and_transforms(
                 model_name=model_name,
@@ -159,6 +172,7 @@ class EVA02CLIP(nn.Module):
                 output_dict=False,
             )
         )
+        
         if tokenizer_path is None:
             tokenizer_path = model_path
         self.tokenizer = open_clip.get_tokenizer(HF_HUB_PREFIX + tokenizer_path)
@@ -171,7 +185,10 @@ class EVA02CLIP(nn.Module):
             world_size=DistVarible.world_size,
         )
 
-    def enable_gradient_checkpointing(self,gradient_checkpointing_kwargs = None):
+    def gradient_checkpointing_enable(self,gradient_checkpointing_kwargs = None):
+        # 梯度检查无法使用，要想使用必须设置{"use_reentrant": false}
+        # 但是这个模型在open_clip内部，然后内部用的视觉模型在timm里面
+        # 自己不好去设置这个参数。
         self.model.set_grad_checkpointing(enable=True)
 
     def encode_image(self, image:torch.Tensor, normalize=True):
@@ -181,6 +198,18 @@ class EVA02CLIP(nn.Module):
         return self.model.encode_text(text, normalize)
 
     def get_logits(self, image, text):
+        """
+            Args:
+                image: [B,C,H,W]
+                text: [B,L]
+            Returns:
+                logits_per_image: [B,B]
+                logits_per_text: [B,B]
+        """
+        device = next(self.model.parameters()).device
+        dtype = next(self.model.parameters()).dtype
+        image = image.to(device=device, dtype=dtype)
+        text = text.to(device=device)
         return self.model.get_logits(image, text)
 
     def forward(
@@ -192,3 +221,14 @@ class EVA02CLIP(nn.Module):
         loss = self.loss(image_features, text_features, logits_bias)
 
         return loss, (image_features, text_features, logits_bias)
+    
+    @torch.no_grad()
+    def inference_forward(self,image, text):
+        # [B,B]
+        logits_per_image, _ = self.get_logits(image, text)
+        # 取对角线元素
+        
+        score = torch.diag(logits_per_image)
+        score = score.detach().to(torch.float32).cpu().numpy().tolist()
+        # score = [{'score': s}for s in score]
+        return None, score
