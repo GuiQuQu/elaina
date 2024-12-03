@@ -6,10 +6,20 @@ from metrics.base_metrics import BaseMetrics
 from logger import logger
 
 class MPDocVQPageAccuracyMetrics(BaseMetrics):
-    def __init__(self, result_path, pred_key="model_output", label_key="label"):
+    def __init__(self, result_path, pred_key="model_output", label_key="label", reverse=True):
+        """
+        Args:
+            result_path: 预测结果文件路径
+            pred_key: 预测结果的key
+            label_key: 真实标签的key
+            reverse: 是否按照预测结果降序排列,
+            reverse = True, 即预测结果越大越好
+            reverse = False, 即预测结果越小越好
+        """
         super().__init__(result_path)
         self.pred_key = pred_key
         self.label_key = label_key
+        self.reverse = reverse
 
     def compute_metrics(self) -> Tuple[float,str]:
         

@@ -52,7 +52,7 @@ def qwen2vl_concat_collator(batch):
 
 
 @Register(name="default_concat_collator")
-def default_concat_collator(batch):
+def default_collator(batch):
     elem = batch[0]
     assert isinstance(elem, dict), f"elem type: {type(elem)}, expected type: dict"
     ret_batch = {}
@@ -60,6 +60,25 @@ def default_concat_collator(batch):
     for k in keys:
         if isinstance(elem[k], torch.Tensor):
             ret_batch[k] = torch.stack([d[k] for d in batch], dim=0)
+        else:
+            ret_batch[k] = [d[k] for d in batch]
+    return ret_batch
+
+@Register(name="triplet_collator")
+def triplet_collator(batch):
+    elem = batch[0]
+    assert isinstance(elem, dict), f"elem type: {type(elem)}, expected type: dict"
+    ret_batch = {}
+    keys = list(elem.keys())
+    for k in keys:
+        if isinstance(elem[k], torch.Tensor):
+            shape = elem[k].shape
+            if all([d[k].shape == shape for d in batch]) and k not in [
+                "negative_images"
+            ]:
+                ret_batch[k] = torch.stack([d[k] for d in batch], dim=0)
+            else:
+                ret_batch[k] = [d[k] for d in batch]
         else:
             ret_batch[k] = [d[k] for d in batch]
     return ret_batch

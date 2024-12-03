@@ -1,0 +1,87 @@
+{
+    "train_dataset": {
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "train",
+        "preprocess_config": {
+            "type": "clip_train_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k"
+        }
+    },
+    "val_dataset": {
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "val",
+        "preprocess_config": {
+            "type": "clip_train_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k"
+        }
+    },
+    "test_dataset": {
+        "type": "mpdocvqa_classify_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "test",
+        "preprocess_config": {
+            "type": "clip_test_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k"
+        }
+    },
+    "model": {
+        "type": "eva02_clip",
+        "model_path": "/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k",
+        "precision": "fp32",
+        "local_loss" : true,
+        "gather_with_grad": true
+    },
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output",
+    "data_collator": "default_concat_collator",
+    "tester": {
+        "type": "custom_tester",
+        "test_raw_model" : true,
+        "output_dir" : "testdata_result/MPDocVQA/clip_classify_output",
+        "checkpoint_list": [
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-5665/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/clip_classify_output/checkpoint-1133/model.safetensors"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size" : 64,
+            "num_workers": 8,
+            "shuffle": false
+        },
+        "metrics": []
+    },
+    "trainer": "hf_trainer",
+    "training_args": {
+        "do_train": true,
+        "do_eval": false,
+        "do_predict": false,
+        "run_name": "test_run_v1",
+        "overwrite_output_dir": true,
+        "bf16": false,
+        "fp16": true,
+        "gradient_checkpointing": false,
+        "gradient_checkpointing_kwargs":{"use_reentrant": false},
+        "remove_unused_columns": true,
+        "num_train_epochs": 30,
+        "per_device_train_batch_size": 32,
+        "dataloader_pin_memory": true,
+        "dataloader_prefetch_factor ": 2,
+        "dataloader_num_workers": 4,
+        "gradient_accumulation_steps": 1,
+        "optim": "adamw_torch",
+        "learning_rate": 1e-6,
+        "max_grad_norm": 1.0,
+        "weight_decay": 0.01,
+        "lr_scheduler_type": "cosine",
+        "warmup_ratio": 0.1,
+        "evaluation_strategy": "no",
+        "save_strategy": "epoch",
+        "save_steps": 5000,
+        "save_safetensors": true,
+        "save_total_limit": 40,
+        "logging_strategy": "steps",
+        "logging_steps": 10,
+        "report_to": "tensorboard"
+    }
+}
