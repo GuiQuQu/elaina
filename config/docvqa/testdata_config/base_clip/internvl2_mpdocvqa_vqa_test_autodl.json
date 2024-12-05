@@ -47,13 +47,16 @@
         "type": "tester.internvl2_tester.InternVL2Tester",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
         "output_dir": "testdataset_result/MPDocVQA/base_clip/internvl_lora_vqa_output",
+        "test_raw_model": true,
         "generation_config": {
             "max_new_tokens": 128,
             "do_sample": false
         },
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5/checkpoint-1000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5/checkpoint-4000/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-1000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-3000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-4000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-4529/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
