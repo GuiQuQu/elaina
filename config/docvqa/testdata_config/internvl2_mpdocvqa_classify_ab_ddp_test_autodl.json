@@ -44,7 +44,7 @@
     "tester": {
         "type": "custom_tester",
         "test_raw_model" : true,
-        "output_dir" : "testdata_result/MPDocVQA/internvl2_classify_ab_output",
+        "output_dir" : "testdataset_result/MPDocVQA/internvl2_classify_ab_output",
         "checkpoint_list": [
             "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-35000/model.safetensors",
             "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-25000/model.safetensors",
