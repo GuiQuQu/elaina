@@ -61,7 +61,7 @@ class MPDocVQAVQAInternVL2TestPreprocessor(BasePreprocessor):
         max_dynamic_patch=6,
         pad2square=False,
         max_seq_length=1024,
-        reverse=True,
+        reverse = True,
         system_message="你是由上海人工智能实验室联合商汤科技开发的书生多模态大模型，英文名叫InternVL, 是一个有用无害的人工智能助手。",
     ) -> None:
         super().__init__()

@@ -1,50 +1,51 @@
 {
     "train_dataset": {
-        "type": "mpdocvqa_classify_dataset",
-        "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
         "split": "train",
         "preprocess_config": {
-            "type": "mpdocvqa_classify_qwen2vl_preprocessor",
-            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+            "type": "mpdocvqa_vqa_qwen2vl_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
             "max_seq_length": 2048
         }
     },
     "val_dataset": {
-        "type": "mpdocvqa_classify_dataset",
-        "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "mpdocvqa_classify_qwen2vl_preprocessor",
-            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+            "type": "mpdocvqa_vqa_qwen2vl_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
             "max_seq_length": 2048
         }
     },
     "test_dataset": {
-        "type": "mpdocvqa_classify_dataset",
-        "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
-        "split": "val",
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "test",
         "preprocess_config": {
-            "type": "mpdocvqa_classify_qwen2vl_preprocessor",
-            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+            "type": "mpdocvqa_vqa_qwen2vl_test_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "classify_result_path": "testdataset_result/MPDocVQA/clip_classify_output/checkpoint-1133-result.json",
             "max_seq_length": 2048
         }
     },
     "model": {
-        "type": "qwen2vl_classify_model",
-        "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+        "type": "qwen2vl_vqa_model",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
         "freeze_vision_model": true,
         "freeze_llm_model": false,
         "model_dtype": "bf16"
     },
-    "output_dir": "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output",
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_output",
     "data_collator": "qwen2vl_concat_collator",
     "tester": {
         "type": "custom_tester",
-        "output_dir": "outputs/MPDocVQA/qwen2vl_classify_output/test_result",
+        "output_dir": "testdataset_result/MPDocVQA/base_clip/qwen2vl_vqa_output",
         "test_raw_model": true,
         "checkpoint_list": [
-            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-30000/pytorch_model.bin",
-            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-41184/pytorch_model.bin"
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_output/checkpoint-4000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_output/checkpoint-4528/pytorch_model.bin"
         ],
         "dataloader_config": {
             "max_steps": -1,
@@ -54,14 +55,7 @@
         },
         "metrics": [
             {
-                "type": "metrics.auc_metrics.AUCMetrics",
-                "pred_key": "model_output",
-                "label_key": "classify_label"
-            },
-            {
-                "type": "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics",
-                "pred_key": "model_output",
-                "label_key": "classify_label"
+                "type": "metrics.docvqa_metrics.anls_metrics.ANLSMetrics"
             }
         ]
     },
@@ -70,7 +64,7 @@
         "do_train": true,
         "do_eval": false,
         "do_predict": false,
-        "run_name": "test_run_v1",
+        "run_name": "train_run_v1",
         "overwrite_output_dir": true,
         "bf16": true,
         "gradient_checkpointing": true,
@@ -81,7 +75,7 @@
         "num_train_epochs": 1,
         "per_device_train_batch_size": 1,
         "dataloader_pin_memory": true,
-        "dataloader_prefetch_factor ": 2,
+        "dataloader_prefetch_factor ": 1,
         "dataloader_num_workers": 4,
         "gradient_accumulation_steps": 8,
         "optim": "adamw_torch",
@@ -92,7 +86,7 @@
         "warmup_ratio": 0.1,
         "evaluation_strategy": "no",
         "save_strategy": "steps",
-        "save_steps": 10000,
+        "save_steps": 1000,
         "save_safetensors": false,
         "save_total_limit": 5,
         "logging_strategy": "steps",

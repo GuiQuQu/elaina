@@ -51,6 +51,7 @@ class MPDocVQAVQAOCRInternVL2TestPreprocessor(BasePreprocessor):
         pad2square=False,
         max_seq_length=1024,
         max_layout_length=1024,
+        reverse = True,
         system_message="你是由上海人工智能实验室联合商汤科技开发的书生多模态大模型，英文名叫InternVL, 是一个有用无害的人工智能助手。",
     ) -> None:
         super().__init__()
@@ -86,6 +87,7 @@ class MPDocVQAVQAOCRInternVL2TestPreprocessor(BasePreprocessor):
             is_train=False, input_size=448, pad2square=pad2square
         )
         self.qid2classifyitems = self.groupby_classify_result(classify_result_path)
+        self.reverse = reverse
 
     def groupby_classify_result(self, classify_result_path):
         qid2items = defaultdict(dict)
@@ -151,7 +153,7 @@ class MPDocVQAVQAOCRInternVL2TestPreprocessor(BasePreprocessor):
                 doc['score'] = classify_items[page_id]
             else:
                 raise ValueError(f"page_id: {page_id} not found in classify_result")
-        documents = sorted(documents, key=lambda x: x['score'], reverse=True)
+        documents = sorted(documents, key=lambda x: x['score'], reverse=self.reverse)
         top1_image_path = documents[0]['image_path']
         top1_ocr_path = documents[0]['ocr_path']
         test_pixel_values, num_tiles = self.get_pixel_values(top1_image_path, self.test_transform)

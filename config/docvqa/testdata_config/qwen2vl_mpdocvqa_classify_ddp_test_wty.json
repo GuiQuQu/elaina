@@ -22,7 +22,7 @@
     "test_dataset": {
         "type": "mpdocvqa_classify_dataset",
         "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
-        "split": "val",
+        "split": "test",
         "preprocess_config": {
             "type": "mpdocvqa_classify_qwen2vl_preprocessor",
             "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
@@ -40,7 +40,7 @@
     "data_collator": "qwen2vl_concat_collator",
     "tester": {
         "type": "custom_tester",
-        "output_dir": "outputs/MPDocVQA/qwen2vl_classify_output/test_result",
+        "output_dir": "testdataset_result/MPDocVQA/qwen2vl_classify_output/test_result",
         "test_raw_model": true,
         "checkpoint_list": [
             "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-30000/pytorch_model.bin",
@@ -52,18 +52,7 @@
             "num_workers": 4,
             "shuffle": false
         },
-        "metrics": [
-            {
-                "type": "metrics.auc_metrics.AUCMetrics",
-                "pred_key": "model_output",
-                "label_key": "classify_label"
-            },
-            {
-                "type": "metrics.docvqa_metrics.mpdocvqa_page_accuracy_metrics.MPDocVQPageAccuracyMetrics",
-                "pred_key": "model_output",
-                "label_key": "classify_label"
-            }
-        ]
+        "metrics": []
     },
     "trainer": "hf_trainer",
     "training_args": {

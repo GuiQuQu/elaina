@@ -44,6 +44,7 @@ class MPDocVQAVQAOCRQwen2VLTestPreprocessor(BasePreprocessor):
         min_pixels=256 * 28 * 28,
         max_pixels=1280 * 28 * 28,
         max_layout_length=960,
+        reverse = True,
         system_message="You are a helpful assistant.",
     ) -> None:
         super().__init__()
@@ -60,7 +61,7 @@ class MPDocVQAVQAOCRQwen2VLTestPreprocessor(BasePreprocessor):
             model_path, min_pixels=min_pixels, max_pixels=max_pixels
         )
         self.qid2classifyitems = self.groupby_classify_result(classify_result_path)
-
+        self.reverse = reverse
         logger.info(
             f"min_tokens {min_pixels // 28 // 28}, max_tokens {max_pixels // 28 // 28}"
         )
@@ -138,7 +139,7 @@ class MPDocVQAVQAOCRQwen2VLTestPreprocessor(BasePreprocessor):
                 doc['score'] = classify_items[page_id]
             else:
                 raise ValueError(f"page_id: {page_id} not found in classify_result")
-        documents = sorted(documents, key=lambda x: x['score'], reverse=True)
+        documents = sorted(documents, key=lambda x: x['score'], reverse=self.reverse)
         top1_image_path = documents[0]['image_path']
         top1_ocr_path = documents[0]['ocr_path']
 
