@@ -1,37 +1,33 @@
 {
     "train_dataset": {
-        "type": "mpdocvqa_vqa_dataset",
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
         "dataset_path": "/root/autodl-tmp/MPDocVQA",
         "split": "train",
         "preprocess_config": {
-            "type": "mpdocvqa_vqa_ocr_internvl2_preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048,
-            "max_layout_length": 640
+            "max_seq_length": 2048
         }
     },
     "val_dataset": {
-        "type": "mpdocvqa_vqa_dataset",
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
         "dataset_path": "/root/autodl-tmp/MPDocVQA",
         "split": "val",
         "preprocess_config": {
-            "type": "mpdocvqa_vqa_ocr_internvl2_preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "max_seq_length": 2048,
-            "max_layout_length": 640
+            "max_seq_length": 2048
         }
     },
     "test_dataset": {
-        "type": "mpdocvqa_vqa_dataset",
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
         "dataset_path": "/root/autodl-tmp/MPDocVQA",
-        "split": "test",
+        "split": "val",
         "preprocess_config": {
-            "type": "mpdocvqa_vqa_ocr_internvl2_test_preprocessor",
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_test_preprocessor.MPDocVQAVQAInternVL2TestPreprocessor",
             "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-            "classify_result_path": "testdataset_result/MPDocVQA/clip_classify_output/checkpoint-1133-result.json",
-            "reverse": true,
-            "max_seq_length": 2048,
-            "max_layout_length": 640
+            "classify_result_path": "outputs/MPDocVQA/classify_output/test_result/checkpoint-35000-result.json",
+            "max_seq_length": 2048
         }
     },
     "model": {
@@ -44,26 +40,23 @@
         "frzzze_mlp": true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_ocr_output",
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output",
     "data_collator": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
     "tester": {
         "type": "tester.internvl2_tester.InternVL2Tester",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
-        "output_dir": "testdataset_result/MPDocVQA/base_clip/internvl_lora_vqa_ocr_output",
-        "test_raw_model": true,
+        "output_dir": "outputs/MPDocVQA/internvl_lora_vqa_output/test_result",
         "generation_config": {
             "max_new_tokens": 128,
             "do_sample": false
         },
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_vqa_ocr_output/checkpoint-1000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_vqa_ocr_output/checkpoint-3000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_vqa_ocr_output/checkpoint-4000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_vqa_ocr_output/checkpoint-4528/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5/checkpoint-1000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/vqa_output_lr1e5/checkpoint-4000/model.safetensors"
         ],
         "dataloader_config": {
             "max_steps": -1,
-            "batch_size": 6,
+            "batch_size": 8,
             "num_workers": 4,
             "shuffle": false
         },

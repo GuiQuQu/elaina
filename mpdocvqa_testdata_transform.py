@@ -56,7 +56,7 @@ if __name__ == "__main__":
     pred_data_path = "testdataset_result/MPDocVQA/base_qwen2vl/qwen2vl_vqa_ocr_output/checkpoint-4000-result.json"
     
     pred_data = read_input(pred_data_path)
-
+    
     testdataset_path = "/root/autodl-tmp/MPDocVQA/test.json"
     
     qid2item = read_testdata(testdataset_path)

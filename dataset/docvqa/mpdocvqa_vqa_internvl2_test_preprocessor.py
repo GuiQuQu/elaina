@@ -167,11 +167,12 @@ class MPDocVQAVQAInternVL2TestPreprocessor(BasePreprocessor):
             documents=documents,
             
         )
-        model_inputs.update(extra)
-        self.save_keys = ['qid', 'answers', 'documents','test_conversation']
+        # model_inputs.update(extra)
+        # self.save_keys = ['qid', 'answers', 'documents','test_conversation']
 
         model_inputs.update(
             dict(
+                extra = extra,
                 # pixel_values=pixel_values,
                 # input_ids=train_inputs["input_ids"].squeeze(),
                 # attention_mask=train_inputs["attention_mask"].squeeze(),

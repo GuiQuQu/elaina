@@ -149,7 +149,7 @@ class InternVL2ClassifyABModel(nn.Module):
             output_hidden_states=True,
             return_dict=True,
         )
-        breakpoint()
+
         logits = transformer_output.logits  # (bsz, seq_len, vocal_size)
         loss = transformer_output.loss
         bsz = logits.size(0)

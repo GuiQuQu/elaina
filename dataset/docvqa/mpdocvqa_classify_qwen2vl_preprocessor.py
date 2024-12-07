@@ -91,18 +91,17 @@ class MPDocVQAClassifyQwen2VLPreprocessor(BasePreprocessor):
 
         image = Image.open(image_path).convert("RGB")
         # 分类的input
-        _, classify_conversation = self.get_prompt(
+        train_conversation, test_conversation = self.get_prompt(
             prompt_template=prompt_template_for_classify,
             image=self.template.image_placeholder,
             question=question,
             answer=label,
         )
-        classify_text = self.get_text(
-            classify_conversation,
-            add_generation_prompt=True,
-        )
-        classify_inputs = self.processor(
-            text = [classify_text],
+        train_text = self.get_text(train_conversation,add_generation_prompt=False)
+        test_text = self.get_text(test_conversation,add_generation_prompt=True)
+
+        train_inputs = self.processor(
+            text=[train_text],
             images=[image],
             videos=None,
             padding="max_length",
@@ -110,13 +109,33 @@ class MPDocVQAClassifyQwen2VLPreprocessor(BasePreprocessor):
             return_tensors="pt",
         )
 
+        test_inputs = self.processor(
+            text = [test_text],
+            images=[image],
+            videos=None,
+            padding="max_length",
+            max_length=self.max_seq_length,
+            return_tensors="pt",
+        )
+
+        train_labels = generate_labels(
+            train_inputs['input_ids'],
+            [train_text],
+            self.processor.tokenizer,
+            self.processor.image_processor,
+            self.template,
+            replace_text=True,
+            image_grid_thw=train_inputs["image_grid_thw"],
+        )
+
+
         # return
         model_inputs = dict()
         extra = dict(
             qid=qid,
             image_path=image_path,
             ocr_path=ocr_path,
-            classify_conversation = classify_conversation,
+            classify_conversation = test_conversation,
             # vqa_train_conversation = vqa_train_conversation,
             # answers=answers,
             classify_label = cls_label,
@@ -126,12 +145,19 @@ class MPDocVQAClassifyQwen2VLPreprocessor(BasePreprocessor):
         model_inputs.update(
             dict(
                 extra = extra,
-                # classify
-                pixel_values=classify_inputs["pixel_values"],
-                image_grid_thw=classify_inputs["image_grid_thw"].squeeze(),
-                input_ids=classify_inputs["input_ids"].squeeze(),
-                attention_mask=classify_inputs["attention_mask"].squeeze(),
+                # classify for mlp, 保持不变
+                pixel_values=test_inputs["pixel_values"],
+                image_grid_thw=test_inputs["image_grid_thw"].squeeze(),
+                input_ids=test_inputs["input_ids"].squeeze(),
+                attention_mask=test_inputs["attention_mask"].squeeze(),
                 cls_label=torch.tensor(cls_label, dtype=torch.long),
+
+                # train for ab, new add
+                train_pixel_values=train_inputs["pixel_values"],
+                train_image_grid_thw=train_inputs["image_grid_thw"].squeeze(),
+                train_input_ids=train_inputs["input_ids"].squeeze(),
+                train_attention_mask=train_inputs["attention_mask"].squeeze(),
+                train_labels=train_labels.squeeze(),
             )
         )
         return model_inputs
