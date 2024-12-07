@@ -15,6 +15,9 @@ from logger import logger
 # rank1 + rank2 + ... + rankm  - (m + m-1 + ... + 1)
 
 def calc_auc(y_true, y_pred):
+    """
+        按照这个auc实现，auc是可能低于0.5的
+    """
     pair = list(zip(y_true, y_pred))
     pair = sorted(pair, key=lambda x: x[1])
     df = pd.DataFrame(

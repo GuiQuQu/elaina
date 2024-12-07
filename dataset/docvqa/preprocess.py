@@ -169,6 +169,12 @@ def preprocess_internlm_for_test(
 )->Dict:
     """
         默认left padding
+        
+        Args:
+            ...
+        Returns:
+            input_ids: torch.Tensor, [B, L]
+            attention_mask: torch.Tensor, [B, L]
     """
     conv = get_conv_template(template_name)
     conv.set_system_message(system_message)
