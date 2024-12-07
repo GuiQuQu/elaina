@@ -3,8 +3,10 @@ from collections import defaultdict
 from typing import Tuple
 from metrics.base_metrics import BaseMetrics
 
+from utils.register import Register
 from logger import logger
 
+@Register(name="mpdocvqa_page_accuracy")
 class MPDocVQPageAccuracyMetrics(BaseMetrics):
     def __init__(self, result_path, pred_key="model_output", label_key="label", reverse=True):
         """
