@@ -40,11 +40,11 @@
         "frzzze_mlp":true,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_mean_output",
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_0_output",
     "data_collator": "internvl2_concat_collator",
     "tester": {
         "type": "default_tester",
-        "output_dir": "outputs/MPDocVQA/internvl2_classify_mean_output/test_result",
+        "output_dir": "outputs/MPDocVQA/internvl2_classify_0_output/test_result",
         "test_raw_model": true,
         "checkpoint_list": [
             "outputs/MPDocVQA/classify_output/checkpoint-40000/model.safetensors",
