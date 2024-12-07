@@ -49,7 +49,7 @@ class MPDocVQAVQAQwen2VLTestPreprocessor(BasePreprocessor):
             model_path, min_pixels=min_pixels, max_pixels=max_pixels
         )
         self.qid2classifyitems = self.groupby_classify_result(classify_result_path)
-        self.reverse = True
+        self.reverse = reverse
 
         logger.info(
             f"min_tokens {min_pixels // 28 // 28}, max_tokens {max_pixels // 28 // 28}"

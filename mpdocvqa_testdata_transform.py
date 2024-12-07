@@ -53,7 +53,7 @@ def generate_answer_json(save_path,pred_data, testdataset):
 
 
 if __name__ == "__main__":
-    pred_data_path = "testdataset_result/MPDocVQA/qwen2vl_vqa_ocr_output/checkpoint-3000-result.json"
+    pred_data_path = "testdataset_result/MPDocVQA/base_qwen2vl/qwen2vl_vqa_ocr_output/checkpoint-4000-result.json"
     
     pred_data = read_input(pred_data_path)
 
