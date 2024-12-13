@@ -18,8 +18,8 @@ class _DistVarible:
         self.world_size = int(os.environ.get("WORLD_SIZE", "1"))
         self.local_rank = int(os.environ.get("LOCAL_RANK", "0"))
 
-        if not dist.is_initialized():
-            self._init_dist()
+        # if not dist.is_initialized():
+        #     self._init_dist()
     
     def _init_dist(self):
         dist.init_process_group(

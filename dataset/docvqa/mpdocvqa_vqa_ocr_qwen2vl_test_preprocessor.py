@@ -32,7 +32,7 @@ String Layout:
 Question: {question}
 Please answer the question based on the image and its its corresponding string layout.
 You should extract the answer from the text in the image without changing the order and form of the words.
-Answer:"""
+Answer:""" 
 
 @Register(name="mpdocvqa_vqa_ocr_qwen2vl_test_preprocessor")
 class MPDocVQAVQAOCRQwen2VLTestPreprocessor(BasePreprocessor):

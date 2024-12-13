@@ -20,6 +20,7 @@ from models.docvqa.internvl2.constant import IMG_CONTEXT_TOKEN
 from logger import logger
 from utils.register import Register
 
+
 def get_torch_dtype(model_dtype: str):
     if model_dtype == "bf16":
         return torch.bfloat16
@@ -161,6 +162,20 @@ class InternVL2ClassifyModel(nn.Module):
             last_idx = torch.tensor(last_idx).to(device)
             return hidden_states[bsz_idx, last_idx, :]
 
+    def inference_forward(
+        self,
+        test_pixel_values,
+        image_flags,
+        test_input_ids,
+        test_attention_mask,
+    ):
+        return self.forward(
+            test_pixel_values=test_pixel_values,
+            image_flags=image_flags,
+            test_input_ids=test_input_ids,
+            test_attention_mask=test_attention_mask,
+        )
+
     def forward(
         self,
         # pixel_values,
@@ -170,7 +185,7 @@ class InternVL2ClassifyModel(nn.Module):
         image_flags,
         test_input_ids,
         test_attention_mask,
-        cls_label,
+        cls_label=None,
     ):
         """
         Args:
