@@ -1,3 +1,4 @@
+import gc
 from typing import List
 import torch
 from torch import nn
@@ -59,7 +60,7 @@ class Qwen2VLVQAModel(nn.Module):
                 attn_implementation="flash_attention_2",
             )
         )
-        
+
         self.tokenizer: Qwen2Tokenizer = Qwen2Tokenizer.from_pretrained(model_path)
         self.tokenizer.padding_side = "left"
 
@@ -74,7 +75,7 @@ class Qwen2VLVQAModel(nn.Module):
             self.warp_qwen2vl_lora(
                 r=warp_qwen2vl_lora, lora_alpha=2 * warp_qwen2vl_lora
             )
-        
+
         self.count_parameters()
 
     def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
@@ -133,6 +134,7 @@ class Qwen2VLVQAModel(nn.Module):
             attention_mask=test_attention_mask,
             image_grid_thw=test_image_grid_thw,
             video_grid_thw=test_video_grid_thw,
+            return_generation_ids=False,
         )
 
     def batch_chat(
@@ -142,8 +144,9 @@ class Qwen2VLVQAModel(nn.Module):
         attention_mask,
         image_grid_thw=None,
         video_grid_thw=None,
+        return_generation_ids=False,
         max_new_tokens=128,
-    ) -> List[str]:
+    ) -> List[str] | str:
         device = self.model.device
         dtype = self.model.dtype
         pixel_values = pixel_values.to(device=device, dtype=dtype)
@@ -158,6 +161,7 @@ class Qwen2VLVQAModel(nn.Module):
             image_grid_thw=image_grid_thw,
             video_grid_thw=video_grid_thw,
             max_new_tokens=max_new_tokens,
+            use_cache=True,
         )
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(input_ids, generated_ids)
@@ -167,7 +171,18 @@ class Qwen2VLVQAModel(nn.Module):
             skip_special_tokens=True,
             clean_up_tokenization_spaces=False,
         )
-        return output_text
+
+        del pixel_values
+        del input_ids
+        del attention_mask
+        del image_grid_thw
+        del generated_ids
+        del generated_ids_trimmed
+        gc.collect()
+        torch.cuda.empty_cache()
+        
+        return (output_text, generated_ids) if return_generation_ids else output_text
+            
 
     def warp_qwen2vl_lora(
         self, r, lora_alpha, freeze_vision_tower=True, lora_dropout=0.05

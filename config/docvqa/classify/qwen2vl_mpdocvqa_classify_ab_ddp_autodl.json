@@ -44,9 +44,10 @@
         "test_raw_model": true,
         "output_dir": "outputs/MPDocVQA/qwen2vl_classify_ab_output",
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-35000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-25000/model.safetensors",
-            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_ab_output/checkpoint-41184/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_classify_ab_output/checkpoint-20000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_classify_ab_output/checkpoint-30000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_classify_ab_output/checkpoint-40000/pytorch_model.bin",
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_classify_ab_output/checkpoint-41184/pytorch_model.bin"
         ],
         "dataloader_config": {
             "max_steps": -1,

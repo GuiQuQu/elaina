@@ -22,7 +22,7 @@ def read_testdata(json_path):
     return qid2item
 
 
-def generate_answer_json(save_path,pred_data, testdataset):
+def generate_answer_json(save_path,pred_data, testdataset, answer_key:str ="model_output"):
     """
     save_path:保存的路径
     pred_data:预测的结果
@@ -31,7 +31,7 @@ def generate_answer_json(save_path,pred_data, testdataset):
     result = []
     for item in pred_data:
         questionId = item["qid"]
-        answer = item["model_output"]
+        answer = item[answer_key]
         top1_page_id = item['documents'][0]['page_id']
         test_item = testdataset[questionId]
         page_idx = -1
@@ -53,7 +53,7 @@ def generate_answer_json(save_path,pred_data, testdataset):
 
 
 if __name__ == "__main__":
-    pred_data_path = "testdataset_result/MPDocVQA/base_qwen2vl/internvl2_vqa_output/checkpoint-4000-result.json"
+    pred_data_path = "testdataset_result/MPDocVQA/cot/cot_qwen2vl_vqa_outputv1/test_result/checkpoint-648-result.json"
     
     pred_data = read_input(pred_data_path)
     
@@ -65,5 +65,6 @@ if __name__ == "__main__":
     generate_answer_json(
         save_path=save_path,
         pred_data=pred_data,
-        testdataset=qid2item
+        testdataset=qid2item,
+        answer_key="pred_answer"
     )

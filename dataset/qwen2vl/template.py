@@ -3,6 +3,16 @@ from typing import List, Tuple
 from dataclasses import dataclass, field
 from typing_extensions import override
 
+from PIL import Image
+
+
+def handle_image(image):
+    if image.startswith("file://"):
+        image_path = image[7:]
+        return Image.open(image_path).convert("RGB")
+    else:
+        raise ValueError("image should be a file path")
+
 
 # 传入指定格式的输入，返回添加完标记的prompt
 @dataclass
@@ -21,7 +31,7 @@ class Template(ABC):
     def set_system_message(self, system_message):
         self.system_message = system_message
 
-    def add_message(self, role, message):
+    def add_message(self, role: str, message: str):
         assert role in self.roles
         self.messages.append((role, message))
 
@@ -134,11 +144,46 @@ class Qwen2VLTemplate(Template):
                 ret += f"{self.mm_start}{self.video_pad}{self.mm_end}"
         return ret
 
+    def parse_message_by_openai_with_imageplaceholder(self, message):
+        ret_text, images = "", []
+        need_image_cnt = 0
+        if not isinstance(message, list):
+            raise ValueError("message should be a list")
+        if len(message) == 0:
+            return ret_text, images
+        if not isinstance(message[0], dict):
+            raise ValueError("each element in message should be a dict")
+        
+        for msg in message:
+            assert isinstance(msg, dict)
+            msg_type = msg["type"]
+            if msg_type == "image" or msg_type == "image_url":
+                images.append(handle_image(msg["image"]))
+            if msg_type == "text":
+                need_image_cnt += msg['text'].count(self.image_placeholder)
+                t = self.parse_msg_by_str(msg["text"])
+                ret_text += t
+        if len(images) != need_image_cnt:
+            raise ValueError(
+                f"image count should be equal to the number of image placeholders in text, but get {len(images)} images and {need_image_cnt} placeholders"
+            )
+        return ret_text, images
+
     def parse_by_openai(self, message):
+        """
+        按照固定的格式解析message,文本中不应该包含图像占位符
+        """
+
         ret = ""
         if isinstance(message, list):
             picture_idx = 1
             video_idx = 1
+            # 寻找msg中的文本输入
+            texts = [msg["text"] for msg in message if msg["type"] == "text"]
+            if any([self.image_placeholder in text for text in texts]):
+                raise ValueError(
+                    "text should not contain image placeholder, if you want organize the format input, please use 'parse_message_by_openai_with_imageplaceholder' method"
+                )
             for msg in message:
                 assert isinstance(msg, dict)
                 msg_type = msg["type"]

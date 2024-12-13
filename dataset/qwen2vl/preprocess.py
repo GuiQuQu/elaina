@@ -21,6 +21,19 @@ def generate_labels(
     video_grid_thw=None,
     
 ):
+    """
+        Args:
+            input_ids: torch.Tensor, shape: [batch_size, seq_len]
+            texts: List[str], shape: [batch_size]
+            tokenizer: Qwen2Tokenizer
+            image_processor: Qwen2VLImageProcessor
+            template: Qwen2VLTemplate
+            replace_text: bool,文本中如果含有图像，则需要将其替换为指定长度的占位符
+            image_grid_thw: torch.Tensor, shape: [batch_size, 3]，和占位符计算有关
+            video_grid_thw: torch.Tensor, shape: [batch_size, 3]，和占位符计算有关
+        Returns:
+            labels: torch.Tensor, shape: [batch_size, seq_len]
+    """
     # 做文本替换
     if replace_text:
         if image_grid_thw is not None:
