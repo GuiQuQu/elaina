@@ -47,11 +47,11 @@
         "output_dir": "outputs/MPDocVQA/internvl2_classify_mean_output/test_result",
         "test_raw_model": true,
         "checkpoint_list": [
-            "outputs/MPDocVQA/classify_output/checkpoint-40000/model.safetensors",
-            "outputs/MPDocVQA/classify_output/checkpoint-35000/model.safetensors"
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_mean_output/checkpoint-30000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl2_classify_mean_output/checkpoint-40000/model.safetensors"
         ],
         "dataloader_config": {
-            "max_steps": 10,
+            "max_steps": -1,
             "batch_size" : 8,
             "num_workers": 4,
             "shuffle": false
