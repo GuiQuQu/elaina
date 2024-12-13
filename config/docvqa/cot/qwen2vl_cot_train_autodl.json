@@ -1,0 +1,56 @@
+{
+    "train_dataset": {
+        "type": "json_dataset",
+        "json_path": "outputs/cot_data/val_rule_cot_data.json",
+        "preprocess_config": {
+            "type": "mpdocvqa_cot_mutli_conv_qwen2vl_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "max_seq_length": 2048
+        }
+    },
+    "model": {
+        "type": "qwen2vl_vqa_model",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+        "warp_qwen2vl_lora": 64,
+        "freeze_vision_model": true,
+        "freeze_llm_model": true,
+        "model_dtype": "bf16"
+    },
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/cot_qwen2vl_vqa_outputv2",
+    "data_collator": "qwen2vl_concat_collator",
+    "trainer": "hf_trainer",
+    "trainer_cls": "hf_multi_conv_trainer",
+    "training_args": {
+        "do_train": true,
+        "do_eval": false,
+        "do_predict": false,
+        "run_name": "train_run_v1",
+        "overwrite_output_dir": true,
+        "bf16": true,
+        "gradient_checkpointing": true,
+        "gradient_checkpointing_kwargs": {
+            "use_reentrant": false
+        },
+        "remove_unused_columns": true,
+        "num_train_epochs": 1,
+        "per_device_train_batch_size": 2,
+        "dataloader_pin_memory": true,
+        "dataloader_prefetch_factor ": 1,
+        "dataloader_num_workers": 0,
+        "gradient_accumulation_steps": 4,
+        "optim": "adamw_torch",
+        "learning_rate": 4e-5,
+        "max_grad_norm": 1.0,
+        "weight_decay": 0.01,
+        "lr_scheduler_type": "cosine",
+        "warmup_ratio": 0.1,
+        "evaluation_strategy": "no",
+        "save_strategy": "steps",
+        "save_steps": 200,
+        "save_safetensors": false,
+        "save_total_limit": 5,
+        "logging_strategy": "steps",
+        "logging_steps": 10,
+        "report_to": "tensorboard"
+    }
+}

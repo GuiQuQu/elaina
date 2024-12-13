@@ -1,0 +1,37 @@
+{
+    "test_dataset": {
+        "type": "json_dataset",
+        "json_path": "outputs/cot_data/test_rule_cot_data.json",
+        "preprocess_config": {
+            "type": "mpdocvqa_cot_multi_conv_qwen2vl_test_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "max_seq_length": 2048,
+            "classify_result_path": "testdataset_result/MPDocVQA/qwen2vl_classify_output/test_result/checkpoint-41184-result.json"
+        }
+    },
+    "model": {
+        "type": "qwen2vl_vqa_model",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+        "warp_qwen2vl_lora": 64,
+        "freeze_vision_model": true,
+        "freeze_llm_model": true,
+        "model_dtype": "bf16"
+    },
+    "data_collator": "qwen2vl_concat_collator",
+    "tester": {
+        "type": "qwen2vl_multi_conversation_tester",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+        "output_dir": "testdataset_result/MPDocVQA/cot/cot_qwen2vl_vqa_outputv1/test_result",
+        "test_raw_model": false,
+        "checkpoint_list": [
+            "/root/autodl-tmp/outputs/MPDocVQA/cot_qwen2vl_vqa_outputv1/checkpoint-648/pytorch_model.bin"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size": 1,
+            "num_workers": 2,
+            "shuffle": false
+        },
+        "metrics": []
+    }
+}
