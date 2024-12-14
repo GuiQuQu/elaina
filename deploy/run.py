@@ -18,11 +18,24 @@ from deploy.gradio_utils import (
 def get_args():
     parser = argparse.ArgumentParser(description="elania gradio interface")
     parser.add_argument(
-        "--config_file", "--config", type=str, default=None, help="The config file"
+        "--config_file",
+        "--config",
+        type=str,
+        default="deploy/config/internvk2_classify_qwen2vl_vqa.json",
+        help="The config file",
     )
-    parser.add_argument("--server_name", type=str, default="0.0.0.0")
+    parser.add_argument("--server_name", type=str, default="127.0.0.1")
     args = parser.parse_args()
     return args
+
+
+def count_images(message, history):
+    num_images = len(message["files"])
+    total_images = 0
+    for message in history:
+        if isinstance(message["content"], tuple):
+            total_images += 1
+    return f"You just uploaded {num_images} images, total uploaded: {total_images+num_images}"
 
 
 def chat_fn(
