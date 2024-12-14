@@ -1,4 +1,9 @@
 {
+    "registry_paths": [
+        "dataset",
+        "models",
+        "deploy"
+    ],
     "classify_model": {
         "type": "internvl2_classify_model",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
@@ -9,7 +14,7 @@
         "frzzze_mlp": true,
         "model_dtype": "bf16"
     },
-    "classify_checkpoint_path": "/root/autodl-tmp/MPDocVQA/internvl2_lora_classify_output/checkpoint-40000/model.safetensors",
+    "classify_checkpoint_path": "/root/autodl-tmp/outputs/MPDocVQA/internvl2_lora_classify_output/checkpoint-40000/model.safetensors",
     "classify_preprocess_config": {
         "type": "gradio_classify_internvl2_preprocessor",
         "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
@@ -22,7 +27,7 @@
         "freeze_llm_model": false,
         "model_dtype": "bf16"
     },
-    "vqa_checkpoint_path": "/root/autodl-tmp/MPDocVQA/qwen2vl_vqa_output/checkpoint-4000/pytorch_model.bin",
+    "vqa_checkpoint_path": "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_output/checkpoint-4000/pytorch_model.bin",
     "vqa_preprocess_config": {
         "type": "gradio_vqa_qwen2vl_preprocessor",
         "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",

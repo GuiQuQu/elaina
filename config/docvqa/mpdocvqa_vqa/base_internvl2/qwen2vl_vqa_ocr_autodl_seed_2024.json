@@ -23,12 +23,12 @@
     "tester": {
         "type": "custom_tester",
         "output_dir": "outputs/MPDocVQA/base_internvl2/qwen2vl_vqa_ocr_output_seed2024/test_result",
+        "test_raw_model": false,
         "checkpoint_list": [
-            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_ocr_output/checkpoint-3000/pytorch_model.bin",
             "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_ocr_output/checkpoint-4000/pytorch_model.bin"
         ],
         "dataloader_config": {
-            "max_steps": -1,
+            "max_steps": 10,
             "batch_size": 6,
             "num_workers": 4,
             "shuffle": false

@@ -41,6 +41,7 @@ class GradioVQAQwen2VLPreprocessor(BasePreprocessor):
         model_path,
         use_ocr=False,
         max_layout_length=1024,
+        max_seq_length= 2048,
         ocr_dir: str = None,
         min_pixels=256 * 28 * 28,
         max_pixels=1280 * 28 * 28,
@@ -56,9 +57,10 @@ class GradioVQAQwen2VLPreprocessor(BasePreprocessor):
         self.use_ocr = use_ocr
         self.max_layout_length = max_layout_length
         self.ocr_dir = ocr_dir
-        assert (
-            self.use_ocr and self.ocr_dir is not None
-        ), "OCR dir is required when use_ocr is True"
+
+        self.max_seq_length = max_seq_length
+        if self.use_ocr:
+            assert self.ocr_dir is not None, "OCR dir is required when use_ocr is True"
 
     def get_prompt(self, prompt_template, answer, **kwargs):
         prompt = prompt_template.format(**kwargs)
@@ -66,17 +68,17 @@ class GradioVQAQwen2VLPreprocessor(BasePreprocessor):
         train_ret = [
             {
                 "role": "user",
-                "content": [{"type": "text", "text": prompt}],
+                "content":prompt,
             },
             {
                 "role": "assistant",
-                "content": [{"type": "text", "text": answer}],
+                "content": answer,
             },
         ]
         test_ret = [
             {
                 "role": "user",
-                "content": [{"type": "text", "text": prompt}],
+                "content":prompt,
             }
         ]
         return train_ret, test_ret
@@ -123,12 +125,12 @@ class GradioVQAQwen2VLPreprocessor(BasePreprocessor):
         image = Image.open(image_path).convert("RGB")
 
         layout = self.transform_ocr2layout(ocr_path)
-        prompt_template = (
+        prompt_template_local = (
             prompt_template_add_layout if self.use_ocr else prompt_template
         )
 
         _, test_conversation = self.get_prompt(
-            prompt_template,
+            prompt_template_local,
             answer="fake answer",
             image=self.template.image_placeholder,
             question=question,

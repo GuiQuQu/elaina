@@ -3,6 +3,7 @@
 # Copyright (c) 2024 OpenGVLab
 # Licensed under The MIT License [see LICENSE for details]
 # --------------------------------------------------------
+import os
 import warnings
 from typing import Any, List, Optional, Tuple, Union
 
@@ -109,7 +110,9 @@ class InternVLChatModel(PreTrainedModel):
         B, N, C = input_embeds.shape
         input_embeds = input_embeds.reshape(B * N, C)
 
-        if torch.distributed.get_rank() == 0:
+        rank = int(os.environ.get('RANK', '0'))
+        # rank = torch.distributed.get_rank()
+        if rank == 0:
             print(f'dynamic ViT batch size: {vit_batch_size}, images per sample: {vit_batch_size / B}, dynamic token length: {N}')
         input_ids = input_ids.reshape(B * N)
         selected = (input_ids == self.img_context_token_id)

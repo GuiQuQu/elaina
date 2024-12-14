@@ -1,9 +1,8 @@
 import gradio as gr
 import argparse
-import random
 from transformers import set_seed
 from functools import partial
-
+import torch
 from utils.register import registry_pycls_by_path
 from arguments import get_config_from_args
 
@@ -15,13 +14,40 @@ from deploy.gradio_utils import (
 )
 
 
+def check_cuda_memory(device):
+    # 获取GPU内存总量（字节）
+    total_memory = torch.cuda.get_device_properties(device).total_memory
+    # 获取已使用的GPU内存（字节）
+    allocated_memory = torch.cuda.memory_allocated(device)
+    # 获取缓存的GPU内存（字节）
+    cached_memory = torch.cuda.memory_reserved(device)
+    total_memory_str = "{:.2f}GB".format(total_memory / (1024**3))
+    allocated_memory_str = "{:.2f}GB".format(allocated_memory / (1024**3))
+    cached_memory_str = "{:.2f}GB".format(cached_memory / (1024**3))
+    ret = (
+        f"[alloc:{allocated_memory_str} cached:{cached_memory_str}|{total_memory_str}]"
+    )
+    return ret
+
+
+def print_cuda0_memory(func):
+    def warpper(*args, **kwargs):
+        device = torch.device("cuda:0")
+        print(f"Before {func.__name__} {check_cuda_memory(device)}")
+        result = func(*args, **kwargs)
+        print(f"After {func.__name__} {check_cuda_memory(device)}")
+        return result
+
+    return warpper
+
+
 def get_args():
     parser = argparse.ArgumentParser(description="elania gradio interface")
     parser.add_argument(
         "--config_file",
         "--config",
         type=str,
-        default="deploy/config/internvk2_classify_qwen2vl_vqa.json",
+        default="deploy/config/internvl2_classify_qwen2vl_vqa_autodl.json",
         help="The config file",
     )
     parser.add_argument("--server_name", type=str, default="127.0.0.1")
@@ -37,7 +63,7 @@ def count_images(message, history):
             total_images += 1
     return f"You just uploaded {num_images} images, total uploaded: {total_images+num_images}"
 
-
+@print_cuda0_memory
 def chat_fn(
     vqa_model, vqa_preprocessor, classify_model, classify_preprocessor, message, history
 ):
@@ -97,9 +123,9 @@ if __name__ == "__main__":
         config.get("classify_model", None), config.get("classify_checkpoint_path", None)
     )
     # load preprocessor
-    vqa_preprocessor = build_preprocessor(config["vqa_preprocessor_config"])
+    vqa_preprocessor = build_preprocessor(config["vqa_preprocess_config"])
     classify_preprocessor = build_preprocessor(
-        config.get("classify_preprocessor_config", None)
+        config.get("classify_preprocess_config", None)
     )
 
     fn = partial(
@@ -111,7 +137,7 @@ if __name__ == "__main__":
         description="Chatbot for MP-DocVQA",
         fn=fn,
         multimodal=True,
-        chatbot=gr.Chatbot(height=500),
+        chatbot=gr.Chatbot(height=500, type="messages"),
         textbox=gr.MultimodalTextbox(
             file_count="multiple",
             file_types=["image"],
@@ -119,7 +145,7 @@ if __name__ == "__main__":
             container=False,
             scale=7,
         ),
-        type="messages",
+        type='messages',
         theme="ocean",
     )
 

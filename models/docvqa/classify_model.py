@@ -202,9 +202,9 @@ class InternVL2ClassifyModel(nn.Module):
         )
         test_input_ids = test_input_ids.to(device=self.model.device)
         test_attention_mask = test_attention_mask.to(device=self.model.device)
-        cls_label = cls_label.to(device=self.model.device)
         image_flags = image_flags.to(device=self.model.device)
-
+        cls_label = cls_label.to(device=self.model.device) if cls_label is not None else None
+        
         transformer_output = self.model(
             pixel_values=test_pixel_values,
             input_ids=test_input_ids,

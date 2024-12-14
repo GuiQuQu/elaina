@@ -122,7 +122,10 @@ class Qwen2VLTemplate(Template):
         if isinstance(message, str):
             return self.parse_msg_by_str(message)
         elif isinstance(message, list):
-            return self.parse_by_openai(message)
+            if self.check_contain_image_placeholder(message):
+                return self.parse_message_by_openai_with_imageplaceholder(message)
+            else:
+                self.parse_by_openai(message)
         else:
             raise ValueError("message should be a list or a string")
 
@@ -153,14 +156,14 @@ class Qwen2VLTemplate(Template):
             return ret_text, images
         if not isinstance(message[0], dict):
             raise ValueError("each element in message should be a dict")
-        
+
         for msg in message:
             assert isinstance(msg, dict)
             msg_type = msg["type"]
             if msg_type == "image" or msg_type == "image_url":
                 images.append(handle_image(msg["image"]))
             if msg_type == "text":
-                need_image_cnt += msg['text'].count(self.image_placeholder)
+                need_image_cnt += msg["text"].count(self.image_placeholder)
                 t = self.parse_msg_by_str(msg["text"])
                 ret_text += t
         if len(images) != need_image_cnt:
@@ -168,6 +171,10 @@ class Qwen2VLTemplate(Template):
                 f"image count should be equal to the number of image placeholders in text, but get {len(images)} images and {need_image_cnt} placeholders"
             )
         return ret_text, images
+
+    def check_contain_image_placeholder(self, message):
+        texts = [msg["text"] for msg in message if msg["type"] == "text"]
+        return any([self.image_placeholder in text for text in texts])
 
     def parse_by_openai(self, message):
         """

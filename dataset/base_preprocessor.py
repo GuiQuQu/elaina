@@ -10,6 +10,9 @@ class BasePreprocessor(abc.ABC):
     def preprocess(self, item):
         pass
 
+    def __call__(self,item):
+        return self.preprocess(item)
+
 
 @Register(name='unchanged_preprocessor')
 class UnchangedPreprocessor(BasePreprocessor):

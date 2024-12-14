@@ -46,7 +46,7 @@ def load_model_with_checkpoint(
     model.eval()
     model.requires_grad_(False)
     if torch.cuda.is_available():
-        model = model.to("cuda:0")
+        model = model.to(f"cuda:0")
     return model
 
 
@@ -61,8 +61,12 @@ def custom_model_inference(model, preprocessor, input):
     ), "model should have inference_forward method"
 
     model_inputs = preprocessor(input)
-    model_inputs = delete_not_used_key_from_batch_in_inference(model, model_inputs)
-    model_inputs = {k: v.to(model.device) for k, v in model_inputs.items()}
+    model_inputs, _ = delete_not_used_key_from_batch_in_inference(model, model_inputs)
+    device = next(model.parameters()).device
+    model_inputs = {
+        k: v.to(device) if isinstance(v, torch.Tensor) else v
+        for k, v in model_inputs.items()
+    }
     with torch.no_grad():
         _, outputs = model.inference_forward(**model_inputs)
     del model_inputs
