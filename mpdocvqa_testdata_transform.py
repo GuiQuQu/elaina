@@ -53,7 +53,7 @@ def generate_answer_json(save_path,pred_data, testdataset, answer_key:str ="mode
 
 
 if __name__ == "__main__":
-    pred_data_path = "testdataset_result/MPDocVQA/cot/cot_qwen2vl_vqa_outputv1/test_result/checkpoint-648-result.json"
+    pred_data_path = "extra/base_qwen2vl_vote_result.json"
     
     pred_data = read_input(pred_data_path)
     
@@ -66,5 +66,5 @@ if __name__ == "__main__":
         save_path=save_path,
         pred_data=pred_data,
         testdataset=qid2item,
-        answer_key="pred_answer"
+        answer_key="self_consistency"
     )

@@ -1,5 +1,5 @@
 {
-    "seed": 2024,
+    "seed": 0,
     "test_dataset": {
         "type": "mpdocvqa_vqa_dataset",
         "dataset_path": "/root/autodl-tmp/MPDocVQA",
@@ -22,13 +22,13 @@
     "data_collator": "qwen2vl_concat_collator",
     "tester": {
         "type": "custom_tester",
-        "output_dir": "outputs/MPDocVQA/base_internvl2/qwen2vl_vqa_ocr_output_seed2024/test_result",
+        "output_dir": "outputs/MPDocVQA/base_internvl2/qwen2vl_vqa_ocr_output_seed0_run1/test_result",
         "test_raw_model": false,
         "checkpoint_list": [
             "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_ocr_output/checkpoint-4000/pytorch_model.bin"
         ],
         "dataloader_config": {
-            "max_steps": 10,
+            "max_steps": -1,
             "batch_size": 6,
             "num_workers": 4,
             "shuffle": false

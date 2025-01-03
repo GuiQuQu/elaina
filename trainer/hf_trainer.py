@@ -107,6 +107,11 @@ class HFTrainer(BaseTrainer):
             trainer_cls = get_cls_or_func(trainer_cls)
             assert issubclass(trainer_cls, Trainer)
 
+        if train_dataset is not None:
+            logger.info(f"Training dataset Length: {len(train_dataset)}")
+        if eval_dataset is not None:
+            logger.info(f"Validation dataset Length: {len(eval_dataset)}")
+
         self.trainer = trainer_cls(
             model=model,
             args=training_args,

@@ -1,0 +1,47 @@
+{
+    "seed": null,
+    "test_dataset": {
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "val",
+        "preprocess_config": {
+            "type": "mpdocvqa_vqa_qwen2vl_test_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "classify_result_path": "outputs/MPDocVQA/classify_output/test_result/checkpoint-40000-result.json",
+            "max_seq_length": 2048
+        }
+    },
+    "model": {
+        "type": "qwen2vl_vqa_model",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+        "generation_config": {
+            "temperature": 0.7,
+            "repetition_penalty": 1.05,
+            "top_p": 0.8,
+            "top_k": 20
+        },
+        "freeze_vision_model": true,
+        "freeze_llm_model": false,
+        "model_dtype": "bf16"
+    },
+    "data_collator": "qwen2vl_concat_collator",
+    "tester": {
+        "type": "custom_tester",
+        "output_dir": "testdataset_result/MPDocVQA/base_internvl2/qwen2vl_vqa_output_v2_run2/test_result",
+        "test_raw_model": false,
+        "checkpoint_list": [
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_ocr_output/checkpoint-4000/pytorch_model.bin"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size": 6,
+            "num_workers": 4,
+            "shuffle": false
+        },
+        "metrics": [
+            {
+                "type": "metrics.docvqa_metrics.anls_metrics.ANLSMetrics"
+            }
+        ]
+    }
+}

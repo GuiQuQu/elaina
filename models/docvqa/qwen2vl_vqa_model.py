@@ -43,6 +43,7 @@ class Qwen2VLVQAModel(nn.Module):
         self,
         model_path,
         warp_qwen2vl_lora: int = 0,
+        generation_config=None,
         freeze_vision_model=True,
         freeze_llm_model=False,
         model_dtype="bf16",
@@ -51,6 +52,10 @@ class Qwen2VLVQAModel(nn.Module):
         config = Qwen2VLConfig.from_pretrained(model_path)
         config.use_cache = False
         self.generation_config = GenerationConfig.from_pretrained(model_path)
+        if generation_config is not None:
+            for key, value in generation_config.items():
+                setattr(self.generation_config, key, value)
+        logger.info(f"[{self.__class__.__name__}] generation_config: {self.generation_config}")
         self.model: Qwen2VLForConditionalGeneration = (
             Qwen2VLForConditionalGeneration.from_pretrained(
                 model_path,
@@ -127,6 +132,7 @@ class Qwen2VLVQAModel(nn.Module):
         test_attention_mask,
         test_image_grid_thw=None,
         test_video_grid_thw=None,
+        max_new_tokens=128,
     ):
         return None, self.batch_chat(
             pixel_values=test_pixel_values,
@@ -135,6 +141,7 @@ class Qwen2VLVQAModel(nn.Module):
             image_grid_thw=test_image_grid_thw,
             video_grid_thw=test_video_grid_thw,
             return_generation_ids=False,
+            max_new_tokens=max_new_tokens,
         )
 
     def batch_chat(
@@ -180,9 +187,8 @@ class Qwen2VLVQAModel(nn.Module):
         del generated_ids_trimmed
         gc.collect()
         torch.cuda.empty_cache()
-        
+
         return (output_text, generated_ids) if return_generation_ids else output_text
-            
 
     def warp_qwen2vl_lora(
         self, r, lora_alpha, freeze_vision_tower=True, lora_dropout=0.05

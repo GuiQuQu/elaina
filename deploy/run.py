@@ -5,7 +5,7 @@ from functools import partial
 import torch
 from utils.register import registry_pycls_by_path
 from arguments import get_config_from_args
-
+from logger import logger
 
 from deploy.gradio_utils import (
     load_model_with_checkpoint,
@@ -63,6 +63,7 @@ def count_images(message, history):
             total_images += 1
     return f"You just uploaded {num_images} images, total uploaded: {total_images+num_images}"
 
+
 @print_cuda0_memory
 def chat_fn(
     vqa_model, vqa_preprocessor, classify_model, classify_preprocessor, message, history
@@ -100,9 +101,52 @@ def chat_fn(
     )
     resp = custom_model_inference(vqa_model, vqa_preprocessor, vqa_input)
     if len(image_paths) > 1:
-        return f"Pred Page Idx: {result[0][2]}\nPage Path: {image_path}\n Answer:{resp}"
+        image_name = image_path.split("/")[-1]
+        text = f"Pred Page Idx: {result[0][2]}\nImage Name: {image_name}\n Answer:{resp}"
+        ret = {
+            "text": text,
+            "files": [image_path],
+        }
+        return ret
     else:
         return f"Answer:{resp}"
+
+
+def vote(data: gr.LikeData):
+    if data.liked:
+        print("You upvoted this message! => " + data.value)
+    else:
+        print("You downvoted this message! => " + data.value)
+
+
+examples = [
+    {
+        "text": "What is the Log-in No. ?",
+        "files": [
+            "/root/elaina/examples/images/fryn0081_p0.jpg",
+            "/root/elaina/examples/images/fryn0081_p1.jpg",
+            "/root/elaina/examples/images/fryn0081_p2.jpg",
+            "/root/elaina/examples/images/fryn0081_p3.jpg",
+            "/root/elaina/examples/images/fryn0081_p4.jpg",
+            "/root/elaina/examples/images/fryn0081_p5.jpg",
+            "/root/elaina/examples/images/fryn0081_p6.jpg",
+            "/root/elaina/examples/images/fryn0081_p7.jpg",
+            "/root/elaina/examples/images/fryn0081_p8.jpg",
+            "/root/elaina/examples/images/fryn0081_p9.jpg",
+        ],
+    },
+    {
+        "text": "What is the personnel costs in the 4th year?",
+        "files": [
+            "/root/elaina/examples/images/hrfw0227_p22.jpg",
+            "/root/elaina/examples/images/hrfw0227_p23.jpg",
+        ],
+    },
+    {
+        "text": "What is the name of the person in the CC field ?",
+        "files": ["/root/elaina/examples/images/lflm0081_p0.jpg"],
+    },
+]
 
 
 if __name__ == "__main__":
@@ -111,7 +155,10 @@ if __name__ == "__main__":
     registry_paths = config["registry_paths"]
     for path in registry_paths:
         registry_pycls_by_path(path)
-    set_seed(config["seed"])
+    if config.get("seed", None) is not None:
+        set_seed(config["seed"])
+    else:
+        logger.warning("seed is None")
     server_name = args.server_name
 
     # load vqa model
@@ -131,13 +178,12 @@ if __name__ == "__main__":
     fn = partial(
         chat_fn, vqa_model, vqa_preprocessor, classify_model, classify_preprocessor
     )
-
     demo = gr.ChatInterface(
         title="MP-DocVQA Chatbot",
-        description="Chatbot for MP-DocVQA",
+        # description="Chatbot for MP-DocVQA",
         fn=fn,
         multimodal=True,
-        chatbot=gr.Chatbot(height=500, type="messages"),
+        chatbot=gr.Chatbot(type="messages", height=600),
         textbox=gr.MultimodalTextbox(
             file_count="multiple",
             file_types=["image"],
@@ -145,8 +191,9 @@ if __name__ == "__main__":
             container=False,
             scale=7,
         ),
-        type='messages',
+        type="messages",
         theme="ocean",
+        examples=examples,
     )
 
     demo.launch(server_name=server_name)

@@ -4,7 +4,7 @@ os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
 
 def download_model(repo_id, local_dir, **kwargs):
-    from huggingface_hub import snapshot_download # 下载仓库
+    from huggingface_hub import snapshot_download # 下载模型
 
     snapshot_download(
         repo_id=repo_id,
@@ -16,7 +16,7 @@ def download_model(repo_id, local_dir, **kwargs):
     )
 
 def download_dataset(repo_id, local_dir, **kwargs):
-    from huggingface_hub import snapshot_download 
+    from huggingface_hub import snapshot_download # 下载数据集
 
     snapshot_download(
         repo_id=repo_id,

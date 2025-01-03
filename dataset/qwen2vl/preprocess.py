@@ -9,6 +9,60 @@ from dataset.qwen2vl.template import Qwen2VLTemplate
 
 IGNORE_INDEX_ID = LabelSmoother.ignore_index
 
+
+def replace_text_func(
+    texts: List[str],
+    image_processor: Qwen2VLImageProcessor,
+    image_grid_thw=None,
+    video_grid_thw=None,
+) -> List[str]:
+    if image_grid_thw is not None:
+        merge_length = image_processor.merge_size**2
+        index = 0
+        for i in range(len(texts)):
+            while "<|image_pad|>" in texts[i]:
+                texts[i] = texts[i].replace(
+                    "<|image_pad|>",
+                    "<|placeholder|>" * (image_grid_thw[index].prod() // merge_length),
+                    1,
+                )
+                index += 1
+            texts[i] = texts[i].replace("<|placeholder|>", "<|image_pad|>")
+
+    if video_grid_thw is not None:
+        merge_length = image_processor.merge_size**2
+        index = 0
+        for i in range(len(texts)):
+            while "<|video_pad|>" in texts[i]:
+                texts[i] = texts[i].replace(
+                    "<|video_pad|>",
+                    "<|placeholder|>" * (video_grid_thw[index].prod() // merge_length),
+                    1,
+                )
+                index += 1
+            texts[i] = texts[i].replace("<|placeholder|>", "<|video_pad|>")
+    return texts
+
+
+def check_over_max_length(
+    text: str,
+    max_length: int,
+    tokenizer: Qwen2Tokenizer,
+    image_processor: Qwen2VLImageProcessor,
+    image_grid_thw=None,
+    video_grid_thw=None,
+    replace_text: bool = True,
+):
+    if replace_text:
+        text = replace_text_func(
+            [text], image_processor, image_grid_thw, video_grid_thw
+        )[0]
+    input_ids = tokenizer(text)["input_ids"]
+    if len(input_ids) > max_length:
+        return True
+    return False
+
+
 #  qwen2vl的默认的padding方式是左padding...
 def generate_labels(
     input_ids: torch.Tensor,
@@ -16,52 +70,57 @@ def generate_labels(
     tokenizer: Qwen2Tokenizer,
     image_processor: Qwen2VLImageProcessor,
     template: Qwen2VLTemplate,
-    replace_text : bool = True,
+    replace_text: bool = True,
     image_grid_thw=None,
     video_grid_thw=None,
-    
 ):
     """
-        Args:
-            input_ids: torch.Tensor, shape: [batch_size, seq_len]
-            texts: List[str], shape: [batch_size]
-            tokenizer: Qwen2Tokenizer
-            image_processor: Qwen2VLImageProcessor
-            template: Qwen2VLTemplate
-            replace_text: bool,文本中如果含有图像，则需要将其替换为指定长度的占位符
-            image_grid_thw: torch.Tensor, shape: [batch_size, 3]，和占位符计算有关
-            video_grid_thw: torch.Tensor, shape: [batch_size, 3]，和占位符计算有关
-        Returns:
-            labels: torch.Tensor, shape: [batch_size, seq_len]
+    Args:
+        input_ids: torch.Tensor, shape: [batch_size, seq_len]
+        texts: List[str], shape: [batch_size]
+        tokenizer: Qwen2Tokenizer
+        image_processor: Qwen2VLImageProcessor
+        template: Qwen2VLTemplate
+        replace_text: bool,文本中如果含有图像，则需要将其替换为指定长度的占位符
+        image_grid_thw: torch.Tensor, shape: [batch_size, 3]，和占位符计算有关
+        video_grid_thw: torch.Tensor, shape: [batch_size, 3]，和占位符计算有关
+    Returns:
+        labels: torch.Tensor, shape: [batch_size, seq_len]
     """
-    # 做文本替换
     if replace_text:
-        if image_grid_thw is not None:
-            merge_length = image_processor.merge_size**2
-            index = 0
-            for i in range(len(texts)):
-                while "<|image_pad|>" in texts[i]:
-                    texts[i] = texts[i].replace(
-                        "<|image_pad|>",
-                        "<|placeholder|>" * (image_grid_thw[index].prod() // merge_length),
-                        1,
-                    )
-                    index += 1
-                texts[i] = texts[i].replace("<|placeholder|>", "<|image_pad|>")
+        texts = replace_text_func(
+            texts, image_processor, image_grid_thw, video_grid_thw
+        )
+    # # 做文本替换
+    # if replace_text:
+    #     if image_grid_thw is not None:
+    #         merge_length = image_processor.merge_size**2
+    #         index = 0
+    #         for i in range(len(texts)):
+    #             while "<|image_pad|>" in texts[i]:
+    #                 texts[i] = texts[i].replace(
+    #                     "<|image_pad|>",
+    #                     "<|placeholder|>"
+    #                     * (image_grid_thw[index].prod() // merge_length),
+    #                     1,
+    #                 )
+    #                 index += 1
+    #             texts[i] = texts[i].replace("<|placeholder|>", "<|image_pad|>")
 
-        if video_grid_thw is not None:
-            merge_length = image_processor.merge_size**2
-            index = 0
-            for i in range(len(texts)):
-                while "<|video_pad|>" in texts[i]:
-                    texts[i] = texts[i].replace(
-                        "<|video_pad|>",
-                        "<|placeholder|>" * (video_grid_thw[index].prod() // merge_length),
-                        1,
-                    )
-                    index += 1
-                texts[i] = texts[i].replace("<|placeholder|>", "<|video_pad|>")
-    
+    #     if video_grid_thw is not None:
+    #         merge_length = image_processor.merge_size**2
+    #         index = 0
+    #         for i in range(len(texts)):
+    #             while "<|video_pad|>" in texts[i]:
+    #                 texts[i] = texts[i].replace(
+    #                     "<|video_pad|>",
+    #                     "<|placeholder|>"
+    #                     * (video_grid_thw[index].prod() // merge_length),
+    #                     1,
+    #                 )
+    #                 index += 1
+    #             texts[i] = texts[i].replace("<|placeholder|>", "<|video_pad|>")
+
     # 生成labels
     targets = input_ids.clone()
     for text, target in zip(texts, targets):

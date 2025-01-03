@@ -9,14 +9,17 @@ from utils.utils import check_environment
 from utils.register import registry_pycls_by_path
 from utils.register import Register
 
-from logger import init_transformer_logger
+from logger import init_transformer_logger, logger
 
 def initialize_by_config(config):
     registry_paths = config['registry_paths']
     for path in registry_paths:
         registry_pycls_by_path(path)
 
-    set_seed(config['seed'])
+    if config['seed'] is not None:
+        set_seed(config['seed'])
+    else:
+        logger.warning("rand seed is not set, the result is not reproducible.")
 
 def main():
     init_transformer_logger()
