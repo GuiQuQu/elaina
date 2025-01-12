@@ -1,6 +1,8 @@
 """
     SPDocVQA transform ocr data to layout text
 """
+# import sys
+# sys.path.append('/root/elaina')
 
 import json
 import os
@@ -252,12 +254,12 @@ def test_transform_ocr2layout(ocr_path):
     save_layout_result(save_path=save_path, document_str=document_str)
 
 if __name__ == "__main__":
-    ocr_path = "/root/elaina/examples/sp/ffbf0023_4.json"
+    ocr_path = "/root/elaina/examples/ocr/sp/ffbf0023_4.json"
     test_transform_ocr2layout(ocr_path)
-    ocr_path = "/root/elaina/examples/sp/ffbf0227_1.json"
+    ocr_path = "/root/elaina/examples/ocr/sp/ffbf0227_1.json"
     test_transform_ocr2layout(ocr_path)
-    ocr_path = "/root/elaina/examples/sp/ffbx0227_7.json"
+    ocr_path = "/root/elaina/examples/ocr/sp/ffbx0227_7.json"
     test_transform_ocr2layout(ocr_path)
-    ocr_path = "/root/elaina/examples/sp/ffdh0224_1.json"
+    ocr_path = "/root/elaina/examples/ocr/sp/ffdh0224_1.json"
     test_transform_ocr2layout(ocr_path)
 
