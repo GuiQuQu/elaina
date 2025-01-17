@@ -31,7 +31,6 @@ def download_dataset(repo_id, local_dir, **kwargs):
 
 if __name__ == "__main__":
     download_model(
-        repo_id="timm/eva02_large_patch14_clip_224.merged2b_s4b_b131k",
-        local_dir="/root/autodl-tmp/pretrain-model/eva02_large_patch14_clip_224.merged2b_s4b_b131k",
-        ignore_patterns=["*.safetensors"],
+        repo_id="OpenGVLab/InternVL2-2B",
+        local_dir="/home/share/InternVL2-2B",
     )

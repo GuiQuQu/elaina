@@ -2,7 +2,8 @@
 # torchvision==0.16.2 
 # torchaudio==2.1.2
 # transformers==4.37.2
-transformers @ git+https://github.com/huggingface/transformers@21fac7abba2a37fae86106f87fcf9974fd1e3830
+transformers==4.48.0
+# transformers @ git+https://github.com/huggingface/transformers@21fac7abba2a37fae86106f87fcf9974fd1e3830
 einops
 tensorboard
 accelerate==0.34.2
