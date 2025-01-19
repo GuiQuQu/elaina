@@ -1,10 +1,10 @@
 
 from collections import defaultdict
 from typing import Tuple
-from metrics.base_metrics import BaseMetrics
+import json
 
+from metrics.base_metrics import BaseMetrics
 from utils.register import Register
-from logger import logger
 
 @Register(name="mpdocvqa_page_accuracy")
 class MPDocVQPageAccuracyMetrics(BaseMetrics):
@@ -14,7 +14,7 @@ class MPDocVQPageAccuracyMetrics(BaseMetrics):
             result_path: 预测结果文件路径
             pred_key: 预测结果的key
             label_key: 真实标签的key
-            reverse: 是否按照预测结果降序排列,
+            reverse: 是否按照预测结果降序排列
             reverse = True, 即预测结果越大越好
             reverse = False, 即预测结果越小越好
         """
@@ -32,14 +32,22 @@ class MPDocVQPageAccuracyMetrics(BaseMetrics):
             qid2items[qid].append(item)
 
         # 计算每个qid的预测结果,取top1结果,top1结果的label为true,则该条数据预测正确
+        page_pred_result = dict()
         total_count = 0
         correct_count = 0
         for qid, items in qid2items.items():
             items = sorted(items, key=lambda x: x[self.pred_key], reverse=True)
+            page_pred_result[qid] = items
             top1_item = items[0]
             top1_label = top1_item[self.label_key]
             if top1_label:
                 correct_count += 1
             total_count += 1
         output_str = f"{correct_count / total_count :.2%}[{correct_count}|{total_count}]"
+        # save page pred result
+        save_path = self.result_path.replace(".json", "_page_pred.json")
+        with open(save_path, "w", encoding="utf-8") as f:
+            json.dump(page_pred_result, f, ensure_ascii=False, indent=2)
         return correct_count / total_count, output_str
+
+

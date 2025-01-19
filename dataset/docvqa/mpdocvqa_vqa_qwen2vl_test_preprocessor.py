@@ -71,17 +71,17 @@ class MPDocVQAVQAQwen2VLTestPreprocessor(BasePreprocessor):
         train_ret = [
             {
                 "role": "user",
-                "content": [{"type": "text", "text": prompt}],
+                "content": prompt,
             },
             {
                 "role": "assistant",
-                "content": [{"type": "text", "text": answer}],
+                "content": answer,
             },
         ]
         test_ret = [
             {
                 "role": "user",
-                "content": [{"type": "text", "text": prompt}],
+                "content": prompt,
             }
         ]
         return train_ret, test_ret

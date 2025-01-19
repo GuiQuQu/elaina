@@ -1,0 +1,40 @@
+{
+    "test_dataset": {
+        "type": "mpdocvqa_vqa_dataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "test",
+        "preprocess_config": {
+            "type": "mpdocvqa_vqa_qwen2vl_test_preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "classify_result_path": "testdataset_result/MPDocVQA/ensemble/classify_2cand/checkpoint-3613-result.json",
+            "max_seq_length": 2048
+        }
+    },
+    "model": {
+        "type": "qwen2vl_vqa_model",
+        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+        "freeze_vision_model": true,
+        "freeze_llm_model": false,
+        "model_dtype": "bf16"
+    },
+    "data_collator": "qwen2vl_concat_collator",
+    "tester": {
+        "type": "custom_tester",
+        "output_dir": "testdataset_result/MPDocVQA/base_ensemble/qwen2vl_vqa_output",
+        "test_raw_model": false,
+        "checkpoint_list": [
+            "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_vqa_output/checkpoint-4528/pytorch_model.bin"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size": 6,
+            "num_workers": 4,
+            "shuffle": false
+        },
+        "metrics": [
+            {
+                "type": "metrics.docvqa_metrics.anls_metrics.ANLSMetrics"
+            }
+        ]
+    }
+}

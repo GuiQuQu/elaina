@@ -53,7 +53,7 @@ def generate_answer_json(save_path,pred_data, testdataset, answer_key:str ="mode
 
 
 if __name__ == "__main__":
-    pred_data_path = "extra/base_qwen2vl_vote_result.json"
+    pred_data_path = "testdataset_result/MPDocVQA/base_ensemble/vote/result_8model.json"
     
     pred_data = read_input(pred_data_path)
     
