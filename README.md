@@ -1,79 +1,127 @@
+# Introduction
 
+This is a project for [MP-DocVQA](https://rrc.cvc.uab.es/?ch=17&com=evaluation&task=4) tasks. The project is based on the following models
+- [InternVL2](https://internvl.github.io/blog/2024-07-02-InternVL-2.0/)
+- [Qwen2VL](https://qwenlm.github.io/zh/blog/qwen2-vl/)
+- [QwenVL](https://github.com/QwenLM/Qwen-VL)
+- [EVA-CLIP](https://github.com/baaivision/EVA/blob/master/EVA-CLIP/README.md)
 
-```shell
-export PYTHONPATH=$PYTHONPATH:$(pwd)
+When only using a **2B size model** and **an RTX 4090 GPU with 24GB memory**, the model achieved **the SOTA ANLS and the SOTA page acc** on the mp-docvqa leaderboard in **Jan 2025**.
+
+Leaderboard is here: [MP-DocVQA](https://rrc.cvc.uab.es/?ch=17&com=evaluation&task=4)
+
+I use a two stage strategy to solve the MP-DocVQA task, based on the dataset's assumption that only one document image can answer the question about document image.
+
+- Step 1. retrieve the most relevant document image from the dataset, using the question and image construct the prompt for MLLM
+- Step 2. Use MLLM to do the SP-DocVQA Task
+
+Because of the high page accuracy in Step 1 and the good performance of MLLM in SP-DocVQA, It is foreseeable to achieve the good performance on MP-DocVQA.
+
+Retrieval Model
+
+# Installation
+
+I use conda to manage the environment, you can create a new conda environment by the following command:
+
+```bash
+conda create -n elaina python=3.10
 ```
 
-pytorch==2.1.2 cuda:12.1 cudnn:8.2.1
+this is the environment setting for the project:
+- Python Version: 3.10
+- PyTorch Version: 2.1.2
+- CUDA Version: 11.8
 
-TODO List
-1. [ ] (p0)利用分类的方式来做mp-docvqa,因此需要训练分类器，目前有两个可选的分类器，选用的分类器是internvl2-2b
-2. [ ] (p0)利用分类的方式来做mp-docvqa,因此需要训练分类器，目前有两个可选的分类器，选用的分类器是clip,这个相当于复现了之前的结果
-3. [ ] (p1)验证internvl2-2b在docvqa的结果
-4. [ ] (p1)验证internvl2-2b + handle_ocr 在docvqa上的结果
-5. [ ] (p1)尝试使用attention的机制来压缩image token,使得模型一次可以输入的image token数量变多，建立在高分辨率需要切图的基础上
+Please check file `requirements.txt` for more required packages.
+
+if you use pip to install torch 2.1.2, the default cuda version is 12.1, you need install torch independently by conda.
+
+```bash
+# CUDA 11.8
+conda install pytorch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+> Notice:
+>
+> If you didn't want to use QwenVL, you can comment the line in `requirements.txt` for qwenvl
+
+# Download Model and Dataset
+
+## Download model
+you can use the script `hf_download.py` in repo to download your wanted model in hugingface model hub. please check the script, and modify the `download_model` function to download the model you want.
+
+Args for `download_model` function:
+- `repo_id` is the model repo id in hugingface model hub
+- `local_dir` is the local model path to save the model
+- any other args for `snapshot_download` function, please check the [function document](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/file_download#huggingface_hub.snapshot_download) for more details
+
+enverionment variable in `hf_download.py`:
+- the script set `HF_ENDPOINT` env var for China user to use the mirror site of huggingface model hub, you can comment the line to use the official site.
+
+```python
+# InternVL2-2B setting:
+download_model(
+    repo_id="OpenGVLab/InternVL2-2B",
+    local_dir="path/to/save/model"
+)
+# Qwen2VL-2B setting:
+download_model(
+    repo_id="Qwen/Qwen2-VL-2B-Instruct",
+    local_dir="path/to/save/model"
+)
+# eva-clip setting:
+download_model(
+    repo_id="timm/eva02_large_patch14_clip_224.merged2b_s4b_b131k",
+    local_dir="path/to/save/model",
+    ignore_patterns=["*.safetensors"],
+)
+```
+
+## Download dataset
+you can download the MP-DocVQA dataset from the [official site](https://rrc.cvc.uab.es/?ch=17&com=downloads), unzip data and put the dataset in any wanted folder, and organize the dataset as the following structure:
+
+```bash
+.
+├── images, the image folder
+├── ocr, the ocr folder, if you download the ocr data
+├── test.json
+├── train.json
+└── val.json
+```
+
+# Training
+you can use the script `run_main.sh` to train or eval the model, just provide the config file.
+
+Please cehck **config List** to find your wanted training config
+
+```bash
+bash run_main.sh --config config_file --do_train
+```
+
+# Evaluation
+
+you can use the script `run_main.sh` to train or eval the model, just provide the config file.
+
+Please cehck **config List** to find your wanted evaluation config
+
+```bash
+bash run_main.sh --config config_file --do_test
+```
 
 
-ddp需要注意的问题
-1. 开启gradient_checkpointing时，find_unused_parameters=False，否则会报错
-问题
+# Config File Structure
 
-进度
-## 9.18
-1. mp-docvqa，使用internvl2-2b作分类的code写完了，正式开始训练
+# Config List
+This is a config path for model training and evaluation, you can modify the config file to train or eval the model.
 
-## 9.19
-1. 完成了训练过程，发现代码没有补充保存最后的ckpt,需要补充一下这部分，已经做的训练不需要了，直接用中间权重即可。
-2. trainer的模型权重保存方式是safetensors,可能会导致safetensors不好读取的问题
-3. 写评测部分的代码，要求支持 1.多ckpt评测,通过传入ckpt_list的方式 2.评测结果保存到文件中 3. 自定义评测函数 4. 自定义评测指标
-4. 支持TODO，优先级没有3高, 多卡，数据并行评测，从简单好实现的角度考虑，不要在最后wait各个进程都结束在收集结果，直接在进程内把结果保存到文件中，最后合并文件
+## InternVL2-2B
+- internvl2-2b-
+## Qwen2VL-2B
 
-## 9.24
-1. TODO 加上了保存最后ckpt的代码，需要进行debug测试, ok
-2. 目前不处理保存为safetensors的问题，在评测load model的时候会处理 ok
-3. 写做作测试的代码,写完了等待debug,支持自定义模型forward 
-4. 写metrics
-5. 目前没有测试过
+# Result
 
-## 9.29
-1. [x] debug save the last model
-2. [x] debug tester code
-3. [ ] 添加转换所有输入到符合model的device的逻辑(没懂)
-4. [x] write metrics
-
-## 10.09
-1. 在dataset中添加在test的时候保存的内容,然后将这些内容保存到对应的文件中
-2. metrics应该怎么写(读保存的文件,载入json, 然后计算指标)
-
-
-分类指标
-1. 计算分类的auc
-2. 针对统计结果，找到相同qid的的预测结果，将模型分进行排序，然后
-
-## 10.10
-1. 等litao跑完了之后debug完整eval+metrics的代码
-2. debug lora训练是哪里出了问题
-3. 开始跑一个ckpt的eval，看看分类的结果
-4. 看看autodl上的卡的价格
-
-目前看，没有用ocr信息，模型的分类准确率已经到85%了
-
-## 10.11
-1. 训练生成答案的模型，
-
-
-联合训练，
-1. 获取用于非正确图像的答案伪标签(利用大模型多样化生成) ok
-2. 把两个任务完全拆开，独立进行
-3. 两个任务的损失loss相加
-
-
-问题
-1. 在num_worker > 0时，在__getitem__设置dataset的属性可能有出问题,因此self.save_keys可能无法正常设置
-
-
-
-# 11.12 目前不支持的功能
-1. 传入logger_level信息，修改对应的logger_level，目前只能用info
-2. 多卡情况下没有测试过logger的输出情况，是否存在相同的内容多次输出的情况
 
