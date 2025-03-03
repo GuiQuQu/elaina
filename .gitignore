@@ -4,3 +4,10 @@
 outputs
 abc.json
 tmp.ipynb
+examples
+testdataset_result
+testdata_result
+test.py
+SimSun.ttf
+.gradio
+extra

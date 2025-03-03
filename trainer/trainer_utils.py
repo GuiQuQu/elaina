@@ -1,6 +1,7 @@
 import os
 import torch
 import transformers
+from copy import deepcopy
 
 from logger import logger
 from utils.utils import get_cls_or_func, load_config
@@ -16,6 +17,7 @@ def load_dataset(dataset_config, split='none') -> torch.utils.data.Dataset:
 
 
 def load_model(model_config) -> torch.nn.Module:
+    model_config = deepcopy(model_config)
     if model_config is None:
         raise ValueError('No model provided.')
     _type = model_config.pop('type', None)

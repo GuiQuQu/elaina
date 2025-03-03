@@ -1,0 +1,107 @@
+{
+    "train_dataset": {
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "train",
+        "preprocess_config": {
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+            "max_seq_length": 2048
+        }
+    },
+    "val_dataset": {
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "val",
+        "preprocess_config": {
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.MPDocVQAVQAInternVL2Preprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+            "max_seq_length": 2048
+        }
+    },
+    "test_dataset": {
+        "type": "dataset.docvqa.mpdocvqa_vqa_dataset.MPDocVQAVqaDataset",
+        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "split": "test",
+        "preprocess_config": {
+            "type": "dataset.docvqa.mpdocvqa_vqa_internvl2_test_preprocessor.MPDocVQAVQAInternVL2TestPreprocessor",
+            "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+            "classify_result_path": "testdataset_result/MPDocVQA/clip_classify_output/checkpoint-1133-result.json",
+            "reverse": true,
+            "max_seq_length": 2048
+        }
+    },
+    "model": {
+        "type": "models.docvqa.internvl2_vqa_model.InternVL2VQAModel",
+        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+        "use_backbone_lora": 0,
+        "use_llm_lora": 128,
+        "freeze_vision_model": true,
+        "freeze_llm_model": true,
+        "frzzze_mlp": true,
+        "model_dtype": "bf16"
+    },
+    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output",
+    "data_collator": "dataset.docvqa.mpdocvqa_vqa_internvl2_preprocessor.internvl2_concat_collator",
+    "tester": {
+        "type": "tester.internvl2_tester.InternVL2Tester",
+        "model_path": "/root/autodl-tmp/pretrain-model/InternVL2-2B",
+        "output_dir": "testdataset_result/MPDocVQA/base_clip/internvl_lora_vqa_output",
+        "test_raw_model": true,
+        "generation_config": {
+            "max_new_tokens": 128,
+            "do_sample": false
+        },
+        "checkpoint_list": [
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-1000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-3000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-4000/model.safetensors",
+            "/root/autodl-tmp/outputs/MPDocVQA/internvl_lora_vqa_output/checkpoint-4529/model.safetensors"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size": 8,
+            "num_workers": 4,
+            "shuffle": false
+        },
+        "metrics": [
+            {
+                "type": "metrics.docvqa_metrics.anls_metrics.ANLSMetrics"
+            }
+        ]
+    },
+    "trainer": "hf_trainer",
+    "training_args": {
+        "do_train": true,
+        "do_eval": false,
+        "do_predict": false,
+        "run_name": "train_run_v1",
+        "overwrite_output_dir": true,
+        "bf16": true,
+        "gradient_checkpointing": true,
+        "gradient_checkpointing_kwargs": {
+            "use_reentrant": false
+        },
+        "remove_unused_columns": true,
+        "num_train_epochs": 1,
+        "per_device_train_batch_size": 4,
+        "dataloader_pin_memory": true,
+        "dataloader_prefetch_factor ": 1,
+        "dataloader_num_workers": 4,
+        "gradient_accumulation_steps": 2,
+        "optim": "adamw_torch",
+        "learning_rate": 1e-5,
+        "max_grad_norm": 1.0,
+        "weight_decay": 0.01,
+        "lr_scheduler_type": "cosine",
+        "warmup_ratio": 0.1,
+        "evaluation_strategy": "no",
+        "save_strategy": "steps",
+        "save_steps": 1000,
+        "save_safetensors": true,
+        "save_total_limit": 5,
+        "logging_strategy": "steps",
+        "logging_steps": 10,
+        "report_to": "tensorboard"
+    }
+}

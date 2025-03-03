@@ -1,7 +1,9 @@
-transformers==4.37.2
-torch==2.1.2
-torchvision==0.16.2 
-torchaudio==2.1.2
+# torch==2.1.2
+# torchvision==0.16.2 
+# torchaudio==2.1.2
+# transformers==4.37.2
+transformers==4.48.0
+# transformers @ git+https://github.com/huggingface/transformers@21fac7abba2a37fae86106f87fcf9974fd1e3830
 einops
 tensorboard
 accelerate==0.34.2
@@ -10,8 +12,19 @@ deepspeed==0.15.1
 peft
 timm
 ipykernel
+pandas
+colorlog
 
 # for docvqa
 sentencepiece
 ninja
 flash-attn
+python-Levenshtein
+open_clip_torch
+
+# for qwenvl
+tiktoken
+matplotlib
+transformers_stream_generator
+optimum
+auto-gptq

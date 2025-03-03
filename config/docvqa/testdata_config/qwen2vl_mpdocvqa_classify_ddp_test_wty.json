@@ -1,0 +1,91 @@
+{
+    "train_dataset": {
+        "type": "mpdocvqa_classify_dataset",
+        "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
+        "split": "train",
+        "preprocess_config": {
+            "type": "mpdocvqa_classify_qwen2vl_preprocessor",
+            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+            "max_seq_length": 2048
+        }
+    },
+    "val_dataset": {
+        "type": "mpdocvqa_classify_dataset",
+        "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
+        "split": "val",
+        "preprocess_config": {
+            "type": "mpdocvqa_classify_qwen2vl_preprocessor",
+            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+            "max_seq_length": 2048
+        }
+    },
+    "test_dataset": {
+        "type": "mpdocvqa_classify_dataset",
+        "dataset_path": "/home/khuang@kean.edu/wty/wkl/MPDocVQA",
+        "split": "test",
+        "preprocess_config": {
+            "type": "mpdocvqa_classify_qwen2vl_preprocessor",
+            "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+            "max_seq_length": 2048
+        }
+    },
+    "model": {
+        "type": "qwen2vl_classify_model",
+        "model_path": "/home/khuang@kean.edu/wty/wkl/pretrain-model/Qwen2-VL-2B-Instruct",
+        "freeze_vision_model": true,
+        "freeze_llm_model": false,
+        "model_dtype": "bf16"
+    },
+    "output_dir": "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output",
+    "data_collator": "qwen2vl_concat_collator",
+    "tester": {
+        "type": "custom_tester",
+        "output_dir": "testdataset_result/MPDocVQA/qwen2vl_classify_output/test_result",
+        "test_raw_model": true,
+        "checkpoint_list": [
+            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-30000/pytorch_model.bin",
+            "/home/khuang@kean.edu/wty/wkl/outputs/MPDocVQA/qwen2vl_classify_output/checkpoint-41184/pytorch_model.bin"
+        ],
+        "dataloader_config": {
+            "max_steps": -1,
+            "batch_size": 8,
+            "num_workers": 4,
+            "shuffle": false
+        },
+        "metrics": []
+    },
+    "trainer": "hf_trainer",
+    "training_args": {
+        "do_train": true,
+        "do_eval": false,
+        "do_predict": false,
+        "run_name": "test_run_v1",
+        "overwrite_output_dir": true,
+        "bf16": true,
+        "gradient_checkpointing": true,
+        "gradient_checkpointing_kwargs": {
+            "use_reentrant": false
+        },
+        "remove_unused_columns": true,
+        "num_train_epochs": 1,
+        "per_device_train_batch_size": 1,
+        "dataloader_pin_memory": true,
+        "dataloader_prefetch_factor ": 2,
+        "dataloader_num_workers": 4,
+        "gradient_accumulation_steps": 8,
+        "optim": "adamw_torch",
+        "learning_rate": 1e-5,
+        "max_grad_norm": 1.0,
+        "weight_decay": 0.01,
+        "lr_scheduler_type": "cosine",
+        "warmup_ratio": 0.1,
+        "evaluation_strategy": "no",
+        "save_strategy": "steps",
+        "save_steps": 10000,
+        "save_safetensors": false,
+        "save_total_limit": 5,
+        "logging_strategy": "steps",
+        "logging_steps": 10,
+        "report_to": "tensorboard"
+    }
+}

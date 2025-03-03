@@ -1,0 +1,34 @@
+{
+    "classify_model": {
+        "type": "internvl2_classify_model",
+        "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
+        "use_backbone_lora": 0,
+        "use_llm_lora": 128,
+        "freeze_vision_model": true,
+        "freeze_llm_model": true,
+        "frzzze_mlp": true,
+        "model_dtype": "bf16"
+    },
+    "classify_checkpoint_path": "/home/klwang/autodl_output/MPDocVQA/classify/internvl2_lora_classify_output/checkpoint-40000/model.safetensors",
+    "classify_preprocess_config": {
+        "type": "gradio_classify_internvl2_preprocessor",
+        "model_path": "/home/klwang/pretrain-model/InternVL2-2B",
+        "max_seq_length": 2048
+    },
+    "vqa_model": {
+        "type": "qwen2vl_vqa_model",
+        "model_path": "/home/klwang/pretrain-model/Qwen2-VL-2B-Instruct",
+        "freeze_vision_model": true,
+        "freeze_llm_model": false,
+        "model_dtype": "bf16"
+    },
+    "vqa_checkpoint_path": "/home/klwang/autodl_output/MPDocVQA/qwen2vl_vqa_output/checkpoint-4000/pytorch_model.bin",
+    "vqa_preprocess_config": {
+        "type": "gradio_vqa_qwen2vl_preprocessor",
+        "model_path": "/home/klwang/pretrain-model/Qwen2-VL-2B-Instruct",
+        "use_ocr": false,
+        "max_layout_length": 1024,
+        "ocr_dir": "/home/klwang/data/MPDocVQA/ocr",
+        "max_seq_length": 2048
+    }
+}
