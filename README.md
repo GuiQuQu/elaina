@@ -112,16 +112,63 @@ Please cehck **config List** to find your wanted evaluation config
 bash run_main.sh --config config_file --do_test
 ```
 
-
-# Config File Structure
-
 # Config List
 This is a config path for model training and evaluation, you can modify the config file to train or eval the model.
 
-## InternVL2-2B
-- internvl2-2b-
-## Qwen2VL-2B
+Notice , in `config` directory, there is a `default_config.json`, the default config is for all experiments, you can cover the default config in your own config file.
 
-# Result
+some config file is for training, and you use the config and give the `--do_test`,the exp is to eval the model in eval-dataset.
 
+some config file is for testing, and you use the config and give the `--do_test`,the exp is to test the model in test-dataset.
+
+| No.  | Config File       | Config Description           |
+|------|------------------------------------------------------------------------------|---------------------------------------------|
+| 1.   | `config/docvqa/spdocvqa_vqa/qwenvl/qwenvl_docvqa_plain_ocr_lora_ddp_autodl.json`  | (train-val) qwen-vl run sp-docvqa w/ ocr, the ocr is plained text       |
+| 2.   | `config/docvqa/spdocvqa_vqa/internvl2/internvl2_docvqa_lora_ddp_autodl.json`    | (train-val) internvl2 run sp-docvqa w/o ocr   |
+| 3.   | `config/docvqa/spdocvqa_vqa/internvl2/internvl2_docvqa_lora_plain_ocr_ddp_autodlv2.json` | (train-val) internvl2 run sp-docvqa w/ ocr , the ocr is plained text     
+| 4.   | `config/docvqa/spdocvqa_vqa/internvl2/internvl2_docvqa_lora_ocr_ddp_autodl.json`   | (train-val) internvl2 run sp-docvqa w/ ocr , the ocr is layouted text          |
+| 5.   | `config/docvqa/spdocvqa_vqa/qwen2vl/qwen2vl_docvqa_ddp_lora_autodl.json`   | (train-val) qwen2vl run sp-docvqa w/o ocr  |
+| 6.   | `config/docvqa/spdocvqa_vqa/qwen2vl/qwen2vl_docvqa_lora_ocr_autodl.json`   | (train-val) qwen2vl run sp-docvqa w/ ocr, the ocr is layout text   |
+| -- | -- | -- |
+| 7.   | `config/docvqa/classify/clip/clip_mpdocvqa_classify_autodl.json`  | (train-val) eva-clip run mp-docvqa retrieval                                                     |
+| 8.   | `config/docvqa/classify/internvl2/internvl2_mpdocvqa_classify_lora_ddp_autodl.json`  | (train-val) internvl2 + mlp (w/o ocr) run mp-docvqa retrieval and classify   |
+| 9.  | `config/docvqa/classify/internvl2/internvl2_mpdocvqa_classify_ab_ddp_autodl.json` | (train-val) internvl2 + ab classify (w/o ocr) run mp-docvqa retrieval and classify  |
+| 10.  | `config/docvqa/classify/qwen2vl/qwen2vl_mpdocvqa_classify_ddp_autodl.json` | (train-val) qwen2vl + mlp (w/o ocr) run mp-docvqa retrieval and classify                         |
+| 11.  | `config/docvqa/classify/qwen2vl/qwen2vl_mpdocvqa_classify_ab_ddp_autodl.json` | (train-val) qwen2vl + ab classify (w/o ocr) run mp-docvqa retrieval and classify  |
+|--| --                  | --     |
+|12.| `config/docvqa/mpdocvqa_vqa/train/qwenvl/qwenvl_mpdocvqa_ocr_autodl.json`   | (train) qwenvl is used for mp-docvqa vqa task, w/ ocr, ocr is layouted ocr     |
+|13.| `config/docvqa/mpdocvqa_vqa/train/internvl2/internvl2_mpdocvqa_vqa_lora_ddp_autodl.json`| (train-eval) internvl2 is used for mp-docvqa vqa task, w/o ocr, base internvl2 classify result, internvl2 is used in mp-docvqa vqa stage, w/o ocr  |
+|14.| `config/docvqa/mpdocvqa_vqa/train/internvl2/internvl2_mpdocvqa_vqa_ocr_lora_ddp_autodl.json` | (train-eval) internvl2 is used for mp-docvqa vqa task w/ ocr, ocr is layouted ocr, base internvl2 classify result, internvl2 is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted ocr |
+|15.| `config/docvqa/mpdocvqa_vqa/train/qwen2vl/qwen2vl_mpdocvqa_vqa_ddp_autodl.json`| (train-eval) qwen2vl is used for mp-docvqa vqa task, w/o ocr, base internvl2 classify result, qwen2vl is used in mp-docvqa vqa stage, w/o ocr  |
+|16.| `config/docvqa/mpdocvqa_vqa/train/qwen2vl/qwen2vl_mpdocvqa_vqa_ocr_ddp_autodl.json`| (train-eval) qwen2vl is used for mp-docvqa vqa task w/ ocr, ocr is layouted ocr,base internvl2 classify result, qwen2vl is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted ocr |
+|--|--|--|
+|17.| `config/docvqa/mpdocvqa_vqa/base_clip/internvl2_mpdocvqa_vqa_autodl.json` | (eval) base clip classify result, internvl2 is used in mp-docvqa vqa stage, w/o ocr |
+|18.| `config/docvqa/mpdocvqa_vqa/base_clip/internvl2_mpdocvqa_vqa_ocr_autodl.json`| (eval) base clip classify result, internvl2 is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text |
+|19.| `config/docvqa/mpdocvqa_vqa/base_clip/qwen2vl_mpdocvqa_vqa_autodl.json`| (eval) base clip classify result, qwen2vl is used in mp-docvqa vqa stage, w/o ocr |
+|20.| `config/docvqa/mpdocvqa_vqa/base_clip/qwen2vl_mpdocvqa_vqa_ocr_autodl.json` | (eval) base clip classify result, qwen2vl is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text |
+|--|--|--|
+|21.|`config/docvqa/mpdocvqa_vqa/base_qwen2vl/internvl2_mpdocvqa_vqa_ddp_autodl.json`| (eval) base qwen2vl classify result, internvl2 is used in mp-docvqa vqa stage, w/o ocr |
+|22.|`config/docvqa/mpdocvqa_vqa/base_qwen2vl/internvl2_mpdocvqa_vqa_ocr_ddp_autodl.json`| (eval) base qwen2vl classify result, internvl2 is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|23.|`config/docvqa/mpdocvqa_vqa/base_qwen2vl/qwen2vl_mpdocvqa_vqa_autodl.json`| (eval) base qwen2vl classify result, qwen2vl is used in mp-docvqa vqa stage, w/o ocr|
+|24.|`config/docvqa/mpdocvqa_vqa/base_qwen2vl/qwen2vl_mpdocvqa_vqa_ocr_autodl.json`| (eval) base qwen2vl classify result, qwen2vl is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|--|--|--|
+|25.|`config/docvqa/testdata_config/clip_mpdocvqa_classify_test_autodl.json`| (test) eva-clip generate mp-docvqa retrieval result in test-dataset |
+|26.| `config/docvqa/testdata_config/internvl2_mpdocvqa_classify_lora_ddp_test_autodl.json` | (test) internvl2 + mlp (w/o ocr) generate mp-docvqa retrieval result in test-dataset |
+|27.|`config/docvqa/testdata_config/internvl2_mpdocvqa_classify_ab_ddp_test_autodl.json`| (test) internvl2 + a/b classify (w/o ocr) generate mp-docvqa retrieval result in test-dataset|
+|28.|`config/docvqa/testdata_config/qwen2vl_mpdocvqa_classify_ddp_test_wty.json`| (test) qwen2vl + mlp (w/o ocr) generate mp-docvqa retrieval result in test-dataset|
+|--|--|--|
+|29.|`config/docvqa/testdata_config/base_clip/internvl2_mpdocvqa_vqa_test_autodl.json`|(test) base clip classify result, internvl2 is used in mp-docvqa vqa stage, w/o ocr|
+|30.|`config/docvqa/testdata_config/base_clip/internvl2_mpdocvqa_vqa_ocr_test_autodl.json`| (test) base clip classify result, internvl2 is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|31.|`config/docvqa/testdata_config/base_clip/qwen2vl_mpdocvqa_vqa_test_autodl.json`|(test) base clip classify result, qwen2vl is used in mp-docvqa vqa stage, w/o ocr|
+|32.|`config/docvqa/testdata_config/base_clip/qwen2vl_mpdocvqa_vqa_ocr_test_autodl.json`|(test) base clip classify result, qwen2vl is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|--|--|--|
+|33.|`config/docvqa/testdata_config/base_internvl2/internvl2_mpdocvqa_vqa_test_autodl.json`|(test) base internvl2 classify result, internvl2 is used in mp-docvqa vqa stage, w/o ocr|
+|34.|`config/docvqa/testdata_config/base_internvl2/internvl2_mpdocvqa_vqa_ocr_ddp_test_autodl.json`|(test) base internvl2 classify result, internvl2 is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|35.|`config/docvqa/testdata_config/base_internvl2/qwen2vl_mpdocvqa_vqa_test_autodl.json`|(test) base internvl2 classify result, qwen2vl is used in mp-docvqa vqa stage, w/o ocr|
+|36.|`config/docvqa/testdata_config/base_internvl2/qwen2vl_mpdocvqa_vqa_ocr_test_autodl.json`|(test) base internvl2 classify result, qwen2vl is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|--|--|--|
+|37.|`config/docvqa/testdata_config/base_qwen2vl/internvl2_mpdocvqa_vqa_test_autodl.json`|(test) base qwen2vl classify result, internvl2 is used in mp-docvqa vqa stage, w/o ocr|
+|38.|`config/docvqa/testdata_config/base_qwen2vl/internvl2_mpdocvqa_vqa_ocr_ddp_test_autodl.json`|(test) base qwen2vl classify result, internvl2 is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
+|39.|`config/docvqa/testdata_config/base_qwen2vl/qwen2vl_mpdocvqa_vqa_test_autodl.json`|(test) base qwen2vl classify result, qwen2vl is used in mp-docvqa vqa stage, w/o ocr|
+|40.|`config/docvqa/testdata_config/base_qwen2vl/qwen2vl_mpdocvqa_vqa_ocr_test_autodl.json`|(test) base qwen2vl classify result, qwen2vl is used in mp-docvqa vqa stage, w/ ocr, ocr is layouted text|
 
