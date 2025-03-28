@@ -1,42 +1,42 @@
 {
     "train_dataset": {
         "type": "mpdocvqa_classify_dataset",
-        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "dataset_path": "/home/share/wang-ke-long-data/MPDocVQA",
         "split": "train",
         "preprocess_config": {
             "type": "mpdocvqa_classify_qwen2vl_preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "model_path": "/home/share/Qwen2-VL-2B-Instruct",
             "max_seq_length": 2048
         }
     },
     "val_dataset": {
         "type": "mpdocvqa_classify_dataset",
-        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "dataset_path": "/home/share/wang-ke-long-data/MPDocVQA",
         "split": "val",
         "preprocess_config": {
             "type": "mpdocvqa_classify_qwen2vl_preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "model_path": "/home/share/Qwen2-VL-2B-Instruct",
             "max_seq_length": 2048
         }
     },
     "test_dataset": {
         "type": "mpdocvqa_classify_dataset",
-        "dataset_path": "/root/autodl-tmp/MPDocVQA",
+        "dataset_path": "/home/share/wang-ke-long-data/MPDocVQA",
         "split": "val",
         "preprocess_config": {
             "type": "mpdocvqa_classify_qwen2vl_preprocessor",
-            "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+            "model_path": "/home/share/Qwen2-VL-2B-Instruct",
             "max_seq_length": 2048
         }
     },
     "model": {
         "type": "qwen2vl_classify_model",
-        "model_path": "/root/autodl-tmp/pretrain-model/Qwen2-VL-2B-Instruct",
+        "model_path": "/home/share/Qwen2-VL-2B-Instruct",
         "freeze_vision_model": true,
         "freeze_llm_model": false,
         "model_dtype": "bf16"
     },
-    "output_dir": "/root/autodl-tmp/outputs/MPDocVQA/qwen2vl_classify_output",
+    "output_dir": "/home/share/wang-ke-long-data/outputs/MPDocVQA/qwen2vl_classify_output",
     "data_collator": "qwen2vl_concat_collator",
     "tester": {
         "type": "custom_tester",
