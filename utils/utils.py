@@ -5,7 +5,7 @@ import inspect
 import torch
 
 from utils.register import Register
-from utils.dist_variable import rank0_context
+from utils.dist_variable import DistVarible
 from logger import logger
 
 
@@ -115,7 +115,7 @@ def check_environment():
     import torch.cuda
     import torch.backends.cudnn as cudnn
 
-    with rank0_context():
+    if DistVarible.is_local_main_process:
         logger.info(f"Python version: {platform.python_version()}")
         logger.info(f"PyTorch version: {torch.__version__}")
         logger.info(f"PyTorch CUDA version: {torch.version.cuda}")
@@ -135,7 +135,7 @@ def check_environment():
     import subprocess
     CUDA_HOME = ex.CUDA_HOME
 
-    with rank0_context():
+    if DistVarible.is_local_main_process:
         logger.info(f"CUDA_HOME:{ex.CUDA_HOME}")
     
     if os.path.exists(CUDA_HOME):
@@ -143,5 +143,5 @@ def check_environment():
         SUBPROCESS_DECODE_ARGS = ()
         cuda_version_str = subprocess.check_output([nvcc, '--version']).strip().decode(*SUBPROCESS_DECODE_ARGS)
         local_cuda_version = re.search(r'release (\d+[.]\d+)', cuda_version_str)
-        with rank0_context():
+        if DistVarible.is_local_main_process:
             logger.info(f"Local CUDA version: {local_cuda_version.group(1)}")

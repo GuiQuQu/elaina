@@ -1,6 +1,6 @@
 #!/bin/bash
 export PYTHONPATH=$PYTHONPATH:$(pwd)
-
+export CUDA_VISIBLE_DEVICES=0
 NUM_NODES=1
 if [ -n "${CUDA_VISIBLE_DEVICES}" ]; then
     # 如果 CUDA_VISIBLE_DEVICES 有值
