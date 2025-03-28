@@ -1,5 +1,5 @@
 """
-    训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
+训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
 """
 
 import random
@@ -15,7 +15,7 @@ from utils.register import Register
 from dataset.docvqa.ocr2layout.mp_ocr2layout import transform_ocr2layout
 from dataset.docvqa.docvqa_utils import truncate_layout
 
-# prompt_template = """You are given an image and a question. 
+# prompt_template = """You are given an image and a question.
 # Image: {image}
 # Question: {question}
 # Please answer the question based on the image.
@@ -51,14 +51,18 @@ class MPDocVQAVQAOCRQwen2VLPreprocessor(BasePreprocessor):
         self.max_layout_length = max_layout_length
         # self.tokenizer: Qwen2Tokenizer = Qwen2Tokenizer.from_pretrained(model_path)
         # self.tokenizer.model_max_length = max_seq_length
-        self.processor = Qwen2VLProcessor.from_pretrained(model_path, min_pixels=min_pixels, max_pixels=max_pixels)
+        self.processor = Qwen2VLProcessor.from_pretrained(
+            model_path, min_pixels=min_pixels, max_pixels=max_pixels
+        )
 
     def transform_ocr2layout(self, ocr_path):
         layout = transform_ocr2layout(ocr_path)
         layout, is_truncated = truncate_layout(
-            layout, tokenizer=self.processor.tokenizer, max_token_length=self.max_layout_length
+            layout,
+            tokenizer=self.processor.tokenizer,
+            max_token_length=self.max_layout_length,
         )
-        if (is_truncated):
+        if is_truncated:
             ocr_name = ocr_path.split("/")[-1]
             logger.info(f"[{self.__class__.__name__}] layout({ocr_name}) is truncated")
         return layout
@@ -67,26 +71,15 @@ class MPDocVQAVQAOCRQwen2VLPreprocessor(BasePreprocessor):
         prompt = prompt_template_add_layout.format(**kwargs)
         # 按照openai的格式组织输入
         train_ret = [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}],
-            },
-            {
-                "role": "assistant",
-                "content": [{"type": "text", "text": answer}],
-            },
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": answer},
         ]
-        test_ret = [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}],
-            }
-        ]
+        test_ret = [{"role": "user", "content": prompt}]
         return train_ret, test_ret
 
     def get_text(self, messages, add_generation_prompt=False):
         """
-            将对话转为添加了特殊标记的文本
+        将对话转为添加了特殊标记的文本
         """
         self.template.clear_messages()
         # self.add_generation_prompt = add_generation_prompt
@@ -108,7 +101,7 @@ class MPDocVQAVQAOCRQwen2VLPreprocessor(BasePreprocessor):
         answers = item["answers"]
 
         image = Image.open(true_image_path).convert("RGB")
-        
+
         layout = self.transform_ocr2layout(true_ocr_path)
         if layout.strip() == "":
             logger.warning(f"[{self.__class__.__name__}] layout is empty, qid: {qid}")
@@ -116,16 +109,16 @@ class MPDocVQAVQAOCRQwen2VLPreprocessor(BasePreprocessor):
             answer=random.choice(answers),
             image=self.template.image_placeholder,
             question=question,
-            layout = layout,
+            layout=layout,
         )
         train_text = self.get_text(train_conversation, add_generation_prompt=False)
         # test_text = self.get_text(test_conversation, add_generation_prompt=True)
         train_inputs = self.processor(
-            text = [train_text],
-            images = [image],
+            text=[train_text],
+            images=[image],
             videos=None,
             padding="max_length",
-            max_length = self.max_seq_length,
+            max_length=self.max_seq_length,
             return_tensors="pt",
         )
 
@@ -160,7 +153,7 @@ class MPDocVQAVQAOCRQwen2VLPreprocessor(BasePreprocessor):
         # self.save_keys = list(extra.keys())
         model_inputs.update(
             dict(
-                extra = extra,
+                extra=extra,
                 pixel_values=train_inputs["pixel_values"],
                 image_grid_thw=train_inputs["image_grid_thw"].squeeze(),
                 input_ids=train_inputs["input_ids"].squeeze(),

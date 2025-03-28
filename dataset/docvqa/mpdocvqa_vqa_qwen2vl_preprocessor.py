@@ -1,5 +1,5 @@
 """
-    训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
+训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
 """
 
 import random
@@ -40,32 +40,23 @@ class MPDocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
 
         # self.tokenizer: Qwen2Tokenizer = Qwen2Tokenizer.from_pretrained(model_path)
         # self.tokenizer.model_max_length = max_seq_length
-        self.processor = Qwen2VLProcessor.from_pretrained(model_path, min_pixels=min_pixels, max_pixels=max_pixels)
+        self.processor = Qwen2VLProcessor.from_pretrained(
+            model_path, min_pixels=min_pixels, max_pixels=max_pixels
+        )
 
     def get_prompt(self, answer, **kwargs):
         prompt = prompt_template.format(**kwargs)
         # 按照openai的格式组织输入
         train_ret = [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}],
-            },
-            {
-                "role": "assistant",
-                "content": [{"type": "text", "text": answer}],
-            },
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": answer},
         ]
-        test_ret = [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}],
-            }
-        ]
+        test_ret = [{"role": "user", "content": prompt}]
         return train_ret, test_ret
 
     def get_text(self, messages, add_generation_prompt=False):
         """
-            将对话转为添加了特殊标记的文本
+        将对话转为添加了特殊标记的文本
         """
         self.template.clear_messages()
         # self.add_generation_prompt = add_generation_prompt
@@ -94,13 +85,13 @@ class MPDocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
         )
         train_text = self.get_text(train_conversation, add_generation_prompt=False)
         # test_text = self.get_text(test_conversation, add_generation_prompt=True)
-        
+
         train_inputs = self.processor(
-            text = [train_text],
-            images = [image],
+            text=[train_text],
+            images=[image],
             videos=None,
             padding="max_length",
-            max_length = self.max_seq_length,
+            max_length=self.max_seq_length,
             return_tensors="pt",
         )
         train_labels = generate_labels(
@@ -125,7 +116,7 @@ class MPDocVQAVQAQwen2VLPreprocessor(BasePreprocessor):
         # self.save_keys = list(extra.keys())
         model_inputs.update(
             dict(
-                extra = extra,
+                extra=extra,
                 pixel_values=train_inputs["pixel_values"],
                 image_grid_thw=train_inputs["image_grid_thw"].squeeze(),
                 input_ids=train_inputs["input_ids"].squeeze(),

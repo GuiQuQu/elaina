@@ -1,5 +1,5 @@
 """
-    训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
+训练单图任务，根据给定的true_answer_page_idx，只让模型在根据这个page_id的图像回答问题
 """
 
 from collections import defaultdict
@@ -93,21 +93,10 @@ class MPDocVQAVQAOCRQwen2VLTestPreprocessor(BasePreprocessor):
         prompt = prompt_template_add_layout.format(**kwargs)
         # 按照openai的格式组织输入
         train_ret = [
-            {
-                "role": "user",
-                "content": prompt,
-            },
-            {
-                "role": "assistant",
-                "content": answer,
-            },
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": answer},
         ]
-        test_ret = [
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ]
+        test_ret = [{"role": "user", "content": prompt}]
         return train_ret, test_ret
 
     def get_text(self, messages, add_generation_prompt=False):
